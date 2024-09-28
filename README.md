@@ -30,6 +30,12 @@ To encode the video stream into HLS format, use the following command:
 ffmpeg -i rtmp://localhost:1935/live/webcam -c:v libx264 -f hls C:\Projects\Apex-Live\backend\media\live\stream.m3u8
 ```
 
+for not saving the stream use 
+
+```bash
+ffmpeg -i rtmp://localhost:1935/live/webcam -c:v libx264 -c:a aac -f flv C:\Projects\Apex-Live\backend\media\live\stream.m3u8
+```
+
 This command will read the RTMP stream and create an HLS playlist file and associated segment files in the specified directory.
 
 ## Important Notes
