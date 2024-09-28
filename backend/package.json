@@ -1,0 +1,14 @@
+{
+  "name": "apex-live",
+  "version": "1.0.0",
+  "description": "a service for webcasting ",
+  "main": "app.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "author": "tanishq dhote",
+  "license": "ISC",
+  "dependencies": {
+    "node-media-server": "^2.7.0"
+  }
+}
