@@ -45,6 +45,7 @@ app.use(express.static(path.join(__dirname)));
 
 // Route for the homepage to serve index.html
 app.get("/", (req, res) => {
+  console.log("nigga")
   res.sendFile(path.join(__dirname, "index.html"), (err) => {
     if (err) {
       res.status(err.status).end();
