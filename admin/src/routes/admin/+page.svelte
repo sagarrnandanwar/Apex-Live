@@ -1,61 +1,78 @@
 <script>
     let admin = true;
-    let viewMode = 1;
+    let viewMode = 0;
     let serialNumber = '';
     let projectName=''
     let emailID=''
     let isAdmin=false
+    let editCam=false
     // Function to handle camera initialization
     async function registerCamera() {
         // Implementation for registering the camera (e.g., storing serial number or location)
         alert('Camera registered with serial number: ' + serialNumber);
     }
 
-    // Function to scan code
-    async function codeScan() {
-        if ('BarcodeDetector' in window) {
-            try {
-                const barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'code_128', 'ean_13'] });
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
+    function openForm(id){
+        editCam=true;
 
-                const scanVideo = async () => {
-                    const barcodes = await barcodeDetector.detect(video);
-                    if (barcodes.length > 0) {
-                        serialNumber = barcodes[0].rawValue;
-                        video.pause();
-                        stream.getTracks().forEach(track => track.stop());
-                    } else {
-                        requestAnimationFrame(scanVideo); // Keep scanning
-                    }
-                };
-                scanVideo();
-            } catch (error) {
-                console.error('Error during barcode scanning:', error);
-            }
-        } else {
-            alert('Barcode scanning is not supported in this browser.');
-        }
     }
 </script>
 
+<div class="{editCam?"flex":"hidden"} flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100svh;width:100vw">
+    <div class="w-2/3 mx-auto">
+        <div >X</div>
+    </div>
+</div>
+
 <div class="flex flex-col bg-gray-200" style="height:100svh;width:100vw">
-    <div class="w-full p-10 h-full rounded-xl">
-        <div class="w-full flex flex-row gap-5 text-2xl ">
+    <div class="w-full py-10 h-full rounded-xl">
+        <div class="w-full flex flex-row gap-5 text-2xl pl-10">
             <button on:click={()=>{viewMode=0}} class="bg-{viewMode==0?"green-700":"transparent"} px-7 order-1 py-2 rounded-xl text-{viewMode==0?"white":"black"} transition-all transform duration-300 {viewMode==0?"hover:bg-green-600 hover:shadow-xl hover:scale-105 text-white":""}">Camera</button>
             <button on:click={()=>{viewMode=2}} class="bg-{viewMode==2?"purple-700":"transparent"} px-7 order-2 py-2 rounded-xl text-{viewMode==2?"white":"black"} transition-all transform duration-300 {viewMode==2?"hover:bg-purple-600  hover:shadow-xl hover:scale-105 text-white":""}">Employees</button>
             <button on:click={()=>{viewMode=1}} class="bg-{viewMode==1?"orange-700":"transparent"} px-7 order-0 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-orange-600  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
         </div>
-        <div class="w-full flex flex-row h-auto">
+        <div class="w-full flex flex-row h-auto px-10">
             <div class="w-full rounded-xl  flex flex-col h-auto text-2xl mt-10 ">
                 {#if viewMode==0}
                     
-                <div class="flex flex-col bg-gray-700 pt-3 rounded-lg gap-1 h-full">
-                    <div class="h-10 w-full bg-gray-500 rounded-lg">
-
-                    </div>
+                <div class="grid grid-rows-2 grid-cols-2 gap-2 px-4 py-4 rounded-lg h-full">
+                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
+                        <div class="px-5 text-center text-white">1</div>
+                        <div class="px-5 text-center text-white">Chimur_1</div>
+                        <div class="px-5 text-center text-white">HF4G17375</div>
+                        <div class="px-5 text-center text-white">ACTIVE</div>
+                    </button>
+                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
+                        <div class="px-5 text-center text-white">2</div>
+                        <div class="px-5 text-center text-white">Chimur_1</div>
+                        <div class="px-5 text-center text-white">HF4G17375</div>
+                        <div class="px-5 text-center text-white">ACTIVE</div>
+                    </button>
+                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
+                        <div class="px-5 text-center text-white">3</div>
+                        <div class="px-5 text-center text-white">Chimur_1</div>
+                        <div class="px-5 text-center text-white">HF4G17375</div>
+                        <div class="px-5 text-center text-white">ACTIVE</div>
+                    </button>
+                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
+                        <div class="px-5 text-center text-white">4</div>
+                        <div class="px-5 text-center text-white">Chimur_1</div>
+                        <div class="px-5 text-center text-white">HF4G17375</div>
+                        <div class="px-5 text-center text-white">ACTIVE</div>
+                    </button>
+                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
+                        <div class="px-5 text-center text-white">5</div>
+                        <div class="px-5 text-center text-white">Chimur_1</div>
+                        <div class="px-5 text-center text-white">HF4G17375</div>
+                        <div class="px-5 text-center text-white">ACTIVE</div>
+                    </button>
+                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
+                        <div class="px-5 text-center text-white">6</div>
+                        <div class="px-5 text-center text-white">Chimur_1</div>
+                        <div class="px-5 text-center text-white">HF4G17375</div>
+                        <div class="px-5 text-center text-white">ACTIVE</div>
+                    </button>
+                    
                 </div>
                 {:else if viewMode==1}
                     <div class="flex flex-row w-full p-3 gap-10 rounded-xl justify-around h-full">
