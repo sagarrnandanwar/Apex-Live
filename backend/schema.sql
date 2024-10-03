@@ -7,6 +7,9 @@ CREATE TABLE employees(
     id SERIAL PRIMARY KEY,
     first_name TEXT,
     last_name TEXT,
+    email TEXT,
+    hashed_password TEXT,
+    is_admin INTEGER,
     phone_number TEXT,
     phone_number2 TEXT
 );
