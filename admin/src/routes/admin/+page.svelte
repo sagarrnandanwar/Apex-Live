@@ -111,12 +111,13 @@
                         <div class="overflow-y-auto bg-gray-300 w-1/2 h-full flex flex-col rounded-lg">
                             <div class="mx-auto mt-5 mb-5 text-4xl ">Register Employee</div>
 
-                            <div class="ml-10 mt-5 my-2">Email :</div>
-                            <input bind:value={emailID} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Email Id">
+                            <div class="ml-10 mt-5 my-2">Name :</div>
+                            <input bind:value={emailID} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Full Name">
                             <div class="ml-10 my-2">Password :</div>
                             <input class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Password">
-                            <div class="ml-10 my-2">Confirm Password :</div>
+                            <div class="ml-10 my-2">Mobile Number :</div>
                             <input class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Confirm Password">
+                        
                             <div class="flex flex-row items-center w-full justify-center my-5 gap-5">
                                 <div>Is Admin?</div> 
                                 <input class="transform scale-[2]" type="checkbox">
