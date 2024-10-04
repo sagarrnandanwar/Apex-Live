@@ -6,23 +6,69 @@
     let emailID=''
     let isAdmin=false
     let editCam=false
+    let editEmployee=false
     // Function to handle camera initialization
     async function registerCamera() {
         // Implementation for registering the camera (e.g., storing serial number or location)
         alert('Camera registered with serial number: ' + serialNumber);
     }
 
-    function openForm(id){
+    function openCamera(id){
         editCam=true;
+    }
+
+    function openEmployee(id){
+        editEmployee=true;
+    }
+
+    function saveChanges(){
 
     }
 </script>
 
-<div class="{editCam?"flex":"hidden"} flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100svh;width:100vw">
-    <div class="w-2/3 mx-auto">
-        <div >X</div>
+<div class="{editCam?"flex":"hidden"} p-10 flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
+    <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
+        <div class="w-full flex flex-row justify-between">
+            <div class="text-5xl w-full flex flex-row justify-center mt-3">
+                Edit Camera
+            </div>
+            <button on:click={()=>{editCam=false}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
+        </div>
+        <div class="flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
+            
+            <div class="ml-10 mt-5 my-2">Project Name :</div>
+            <input bind:value={projectName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Project Name">
+            <div class="ml-10 my-2">Location :</div>
+            <input class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Location">
+            <div class="ml-10 mt-5 my-2">Serial Number :</div>
+            <input bind:value={serialNumber} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
+            <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+        </div>
     </div>
 </div>
+
+<div class="{editEmployee?"flex":"hidden"} p-10 flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
+    <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
+        <div class="w-full flex flex-row justify-between">
+            <div class="text-5xl w-full flex flex-row justify-center mt-3">
+                Edit Camera
+            </div>
+            <button on:click={()=>{editEmployee=false}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
+        </div>
+        <div class="flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
+            
+            <div class="ml-10 mt-5 my-2">Employee Name :</div>
+            <input bind:value={projectName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Employee Name">
+            <div class="ml-10 my-2">Password :</div>
+            <input class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Password">
+            <div class="ml-10 mt-5 my-2">Phone Number :</div>
+            <input bind:value={serialNumber} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Mobile Number">
+            <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+
 
 <div class="flex flex-col bg-gray-200" style="height:100svh;width:100vw">
     <div class="w-full py-10 h-full rounded-xl">
@@ -35,45 +81,16 @@
             <div class="w-full rounded-xl  flex flex-col h-auto text-2xl mt-10 ">
                 {#if viewMode==0}
                     
-                <div class="grid grid-rows-2 grid-cols-2 gap-2 px-4 py-4 rounded-lg h-full">
-                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
-                        <div class="px-5 text-center text-white">1</div>
-                        <div class="px-5 text-center text-white">Chimur_1</div>
-                        <div class="px-5 text-center text-white">HF4G17375</div>
-                        <div class="px-5 text-center text-white">ACTIVE</div>
-                    </button>
-                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
-                        <div class="px-5 text-center text-white">2</div>
-                        <div class="px-5 text-center text-white">Chimur_1</div>
-                        <div class="px-5 text-center text-white">HF4G17375</div>
-                        <div class="px-5 text-center text-white">ACTIVE</div>
-                    </button>
-                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
-                        <div class="px-5 text-center text-white">3</div>
-                        <div class="px-5 text-center text-white">Chimur_1</div>
-                        <div class="px-5 text-center text-white">HF4G17375</div>
-                        <div class="px-5 text-center text-white">ACTIVE</div>
-                    </button>
-                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
-                        <div class="px-5 text-center text-white">4</div>
-                        <div class="px-5 text-center text-white">Chimur_1</div>
-                        <div class="px-5 text-center text-white">HF4G17375</div>
-                        <div class="px-5 text-center text-white">ACTIVE</div>
-                    </button>
-                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
-                        <div class="px-5 text-center text-white">5</div>
-                        <div class="px-5 text-center text-white">Chimur_1</div>
-                        <div class="px-5 text-center text-white">HF4G17375</div>
-                        <div class="px-5 text-center text-white">ACTIVE</div>
-                    </button>
-                    <button on:click={()=>{openForm("id")}} class=" flex flex-row w-1/2 w-full hover:bg-gray-600 transform hover:scale-95 hover:cursor-pointer transition-all duration-300 px-2 py-2 bg-gray-700 rounded-lg">
-                        <div class="px-5 text-center text-white">6</div>
-                        <div class="px-5 text-center text-white">Chimur_1</div>
-                        <div class="px-5 text-center text-white">HF4G17375</div>
-                        <div class="px-5 text-center text-white">ACTIVE</div>
-                    </button>
+                    <div class="grid grid-rows-2 grid-cols-2 gap-2 px-4 py-4 rounded-lg h-full">
+                        <button on:click={()=>{openCamera("id")}} class=" flex flex-row w-1/2 w-full transform hover:scale-95 hover:cursor-pointer text-center text-black hover:bg-gray-300 hover:text-gray-700 transition-all duration-300 px-2 py-2 bg-gray-100 rounded-lg">
+                            <div class="px-5 ">1</div>
+                            <div class="px-5 ">Chimur_1</div>
+                            <div class="px-5 ">HF4G17375</div>
+                            <div class="px-5 ">ACTIVE</div>
+                        </button>
+                    </div>
                     
-                </div>
+
                 {:else if viewMode==1}
                     <div class="flex flex-row w-full p-3 gap-10 rounded-xl justify-around h-full">
                         <div class="bg-gray-300 w-1/2 h-full flex flex-col p-3 rounded-lg ">
@@ -112,9 +129,16 @@
                     
                 {:else}
                     
-                <div>
-                    nigga
-                </div>
+                    <div class="grid grid-rows-2 grid-cols-2 gap-2 px-4 py-4 rounded-lg h-full">
+                        <button on:click={()=>{openEmployee("id")}} class=" flex flex-row w-1/2 w-full transform hover:scale-95 hover:cursor-pointer text-center text-black hover:bg-gray-300 hover:text-gray-700 transition-all duration-300 px-2 py-2 bg-gray-100 rounded-lg">
+                            <div class="px-5 ">1</div>
+                            <div class="px-5 ">Chimur_1</div>
+                            <div class="px-5 ">HF4G17375</div>
+                            <div class="px-5 ">ACTIVE</div>
+                        </button>
+                    </div>
+
+
                 {/if}
             </div>
         </div>
