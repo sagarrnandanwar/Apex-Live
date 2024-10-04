@@ -1,3 +1,4 @@
+import 'package:app/utilities/input.dart';
 import 'package:flutter/material.dart';
 
 
@@ -10,14 +11,19 @@ class LoginPage extends StatefulWidget{
 
 class _LoginPageState extends State<LoginPage>{
   int bottomNavIndex=0;
+  TextEditingController name = TextEditingController(),password=TextEditingController();
+
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: CustomScrollView(
-          physics:BouncingScrollPhysics(),
+          physics:const BouncingScrollPhysics(),
           slivers:[
-
-        ]
+            Image.network(""),
+            Input(controller: name, label: "name", icon: Icons.person),
+            Input(controller: password, label: "password", icon: Icons.password),
+          ]
       )
     );
   }

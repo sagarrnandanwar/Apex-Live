@@ -22,7 +22,7 @@ class MainApp extends StatelessWidget{
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const UserPage(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
       routes:{
         '/login': (context) => const LoginPage(),
