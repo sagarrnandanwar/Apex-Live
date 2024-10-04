@@ -1,7 +1,6 @@
 import 'package:app/pages/login_page.dart';
 import 'package:app/pages/user_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() {
   // startApp();
@@ -23,11 +22,11 @@ class MainApp extends StatelessWidget{
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: UserPage(),
+      home: const UserPage(),
       debugShowCheckedModeBanner: false,
       routes:{
-        '/login': (context) => LoginPage(),
-        '/user': (context) => UserPage(),
+        '/login': (context) => const LoginPage(),
+        '/user': (context) => const UserPage(),
       }
     );
   }

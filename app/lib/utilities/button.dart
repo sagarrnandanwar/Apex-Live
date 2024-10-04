@@ -12,11 +12,11 @@ Widget Button(BuildContext context,double w,String label,Future<void> Function()
           decoration: BoxDecoration(
             color: Colors.blue,
             borderRadius: BorderRadius.circular(25),
-          ),  child:Padding(padding: EdgeInsets.symmetric(horizontal: 10,vertical: 13),
+          ),  child:Padding(padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 13),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(label,style: TextStyle(color:Colors.white,fontSize: 17),textAlign: TextAlign.center,),
+                Text(label,style: const TextStyle(color:Colors.white,fontSize: 17),textAlign: TextAlign.center,),
               ],
             )
         ),
