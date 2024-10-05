@@ -84,6 +84,28 @@
         }
     }
 
+    async function fetchCameras() {
+        try {
+            const response = await fetch(`${url}/getCameras`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const { error } = await response.json();
+                errorMessage = error;
+                return;
+            }
+
+            cameraList = await response.json();
+        } catch (error) {
+            console.error('Error fetching cameras:', error);
+            errorMessage = 'An error occurred while fetching cameras.';
+        }
+    }
 
     async function fetchEmployees() {
         try {
@@ -183,7 +205,41 @@
     }
 
 
+    async function registerCamera() {
+        if (!serialNumber || !cameraPollStation || serialNumber=='' || cameraPollStation=='') {
+            alert("Please enter all name, password and number");
+            return;
+        }
 
+        try {
+            const response = await fetch(`${url}/registerCamera`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    number: serialNumber,
+                    poll_station: cameraPollStation,    
+                }) 
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if(data.done){
+                    alert("Camera registered! with model number : " + data.name)
+                    serialNumber=''
+                }
+            } else {
+                alert(data.error || 'Registeration failed');
+            }
+        } catch (error) {
+            console.error('Error during registering:', error);
+            alert("An error occurred during registering. Please try again.");
+        }
+
+        }
 
 
     async function registerEmployee(){
@@ -258,17 +314,13 @@
     }
 
 
-    // Function to handle camera initialization
-    async function registerCamera() {
-        // Implementation for registering the camera (e.g., storing serial number or location)
-        alert('Camera registered with serial number: ' + serialNumber);
-    }
+   
 
     function getInfo(){
         fetchPollingStations()
         fetchEmployees()
         fetchTalukas()
-        
+        fetchCameras()
     }
 
     function openCamera(id){
@@ -358,7 +410,32 @@
             <div class="w-full rounded-xl  flex flex-col h-auto text-2xl mt-10 ">
                 {#if viewMode==0}
                     
-                    <p>1</p>
+                <div class="overflow-x-auto rounded-xl">
+                    <table class="min-w-full bg-white shadow-md rounded-lg">
+                      <thead>
+                        <tr class="bg-gray-800 text-white text-left">
+                          <th class="py-2 px-4">Camera ID</th>
+                          <th class="py-2 px-4">Serial Number</th>
+                          <th class="py-2 px-4">Stream URL</th>
+                          <th class="py-2 px-4">Polling Station</th>
+                          <th class="py-2 px-4">Operator</th>
+                          <th class="py-2 px-4">Is Active</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {#each cameraList as camera (camera.id)}
+                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-2 px-4">{camera.camera_id}</td>
+                            <td class="py-2 px-4">{camera.serial_number}</td>
+                            <td class="py-2 px-4"><a href={camera.stream_url} target="_blank" class="text-blue-500 hover:underline">{camera.stream_url}</a></td>
+                            <td class="py-2 px-4">{camera.polling_station}</td>
+                            <td class="py-2 px-4">{camera.operator_name}</td>
+                            <td class="py-2 px-4">{camera.is_active ? 'Active' : 'Inactive'}</td>
+                          </tr>
+                        {/each}
+                      </tbody>
+                    </table>
+                  </div>
                     
 
                 {:else if viewMode==1}
@@ -370,7 +447,9 @@
                             <div class="ml-10 mt-5 my-2">Polling Station :</div>
                                 <select bind:value={cameraPollStation} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
                                     {#each pollingStationList as poll}
-                                        <option>{poll.id}) {poll.polling_station}</option>
+                                        <option>
+                                            {poll.polling_station}
+                                        </option>
                                     {/each}
                                 </select>
                             <div class="ml-10 mt-5 my-2">Serial Number :</div>
@@ -445,60 +524,79 @@
                     
                 {:else if viewMode==2}
                     
-                    <div class="flex flex-wrap gap-3 w-full bg-gray-200 p-10 rounded-2xl">
-                        {#each employeeList as employee}
-                            <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-col gap-3 p-5 rounded-2xl bg-white">
-                                <div class="text-2xl w-full flex flex-row gap-4 justify-between">
-                                    <div class="flex flex-row gap-4">
-                                        <div>{employee.id} ) </div>
-                                        <div>{employee.full_name}</div>
-                                    </div>
-                                    <div>{employee.is_admin?"admin":"user"}</div>
-                                </div>
-                                <div class="text-2xl w-full flex flex-row gap-4 justify-between">
-                                    <div>Mobile No.</div>
-                                    <div>+91 {employee.phone_number}</div>
-                                </div>
-                            </button>
+                <div class="overflow-x-auto rounded-xl">
+                    <table class="min-w-full bg-white shadow-md rounded-xl">
+                      <thead>
+                        <tr class="bg-gray-800 text-white text-left">
+                          <th class="py-2 px-4">ID</th>
+                          <th class="py-2 px-4">Full Name</th>
+                          <th class="py-2 px-4">Phone Number</th>
+                          <th class="py-2 px-4">Admin Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {#each employeeList as employee (employee.id)}
+                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-2 px-4">{employee.id}</td>
+                            <td class="py-2 px-4">{employee.full_name}</td>
+                            <td class="py-2 px-4">{employee.phone_number}</td>
+                            <td class="py-2 px-4">{employee.is_admin ? 'Admin' : 'User'}</td>
+                          </tr>
                         {/each}
-                    </div>
+                      </tbody>
+                    </table>
+                  </div>
 
 
 
                 {:else if viewMode==3}
 
-                <div class="flex flex-wrap gap-3 w-full bg-gray-200 p-10 rounded-2xl">
-                    {#each pollingStationList as polls}
-                        <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-row gap-3 p-5 rounded-2xl bg-white">   
-                            <div class="flex flex-row justify-between">
-                                <div class="flex flex-row">
-                                    <div>{polls.id})  </div>
-                                    <div>{polls.polling_station}</div>
-                                </div>
-                            </div>
-                        </button>
-                    {/each}
-                    <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-row gap-3 p-5 rounded-2xl bg-white">   
-                        <div class="flex flex-row justify-between">
-                            <div class="flex flex-row gap-4">
-                                <div>1) </div>
-                                <div>ADDAWDAWD</div>
-                            </div>
-                        </div>
-                    </button>
-                </div>
+                <div class="overflow-x-auto  rounded-xl">
+                    <table class="min-w-full bg-white shadow-md rounded-lg">
+                      <thead>
+                        <tr class="bg-gray-800 text-white text-left">
+                          <th class="py-2 px-4">Polling Station ID</th>
+                          <th class="py-2 px-4">Polling Station Name</th>
+                          <th class="py-2 px-4">Address</th>
+                          <th class="py-2 px-4">Taluka</th>
+                          <th class="py-2 px-4">Operator</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {#each pollingStationList as station (station.polling_station_id)}
+                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-2 px-4">{station.polling_station_id}</td>
+                            <td class="py-2 px-4">{station.polling_station}</td>
+                            <td class="py-2 px-4">{station.polling_address}</td>
+                            <td class="py-2 px-4">{station.taluka_name}</td>
+                            <td class="py-2 px-4">{station.operator_name}</td>
+                          </tr>
+                        {/each}
+                      </tbody>
+                    </table>
+                  </div>
 
                 
                 {:else if viewMode==4}
 
-                <div class="flex flex-wrap gap-3 w-full bg-gray-200 p-10 rounded-2xl">
-                    {#each talukasList as taluka}
-                        <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-row gap-3 p-5 rounded-2xl bg-white">   
-                            <div>{taluka.id})  </div>
-                            <div>{taluka.taluka}</div>
-                        </button>
-                    {/each}
-                </div>
+                <div class="overflow-x-auto  rounded-xl">
+                    <table class="min-w-full bg-white shadow-md rounded-lg">
+                      <thead>
+                        <tr class="bg-gray-800 text-white text-left">
+                          <th class="py-2 px-4">Taluka ID</th>
+                          <th class="py-2 px-4">Taluka Name</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {#each talukasList as taluka (taluka.id)}
+                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-2 px-4">{taluka.id}</td>
+                            <td class="py-2 px-4">{taluka.taluka}</td>
+                          </tr>
+                        {/each}
+                      </tbody>
+                    </table>
+                  </div>
 
 
                 {/if}

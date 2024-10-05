@@ -63,26 +63,65 @@ app.get('/getTalukas',authenticateToken,async (req,res)=>{
 })
 
 
-app.get('/getPollingStation',authenticateToken,async (req,res)=>{
-    console.log('poll')
+app.get('/getCameras',authenticateToken,async (req,res)=>{
     try{
-            const query = `
-            SELECT 
-                ps.id, 
-                ps.polling_station, 
-                ps.polling_address, 
-                t.taluka_name, 
-                e.full_name AS operator_name 
-            FROM 
-                polling_stations ps
-            JOIN 
-                employees e ON ps.operator = e.id
-            JOIN 
-                taluka t ON ps.taluka = t.id;
-           `;
+        const query = `        
+                SELECT
+                    ps.id AS polling_station_id,
+                    ps.polling_station,
+                    ps.polling_address,
+                    t.taluka AS taluka_name,
+                    e.full_name AS operator_name,
+                    c.id AS camera_id,
+                    c.serial_number,
+                    c.stream_url,
+                    c.sent_at,
+                    c.removed_at,
+                    c.is_active,
+                    s.id AS stream_id,
+                    s.start_time,
+                    s.end_time
+                FROM
+                    polling_stations ps
+                LEFT JOIN
+                    taluka t ON ps.taluka = t.id
+                LEFT JOIN
+                    employees e ON ps.operator = e.id
+                LEFT JOIN
+                    cameras c ON ps.id = c.PS
+                LEFT JOIN
+                    streams s ON c.id = s.camera;
 
+                        
+        `;       
         const { rows } = await pool.query(query);
-        console.log(rows)
+
+        res.status(200).json(rows);
+    }catch(err){
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+
+app.get('/getPollingStation',authenticateToken,async (req,res)=>{
+    try{
+        const query = `        
+                SELECT
+                    ps.id AS polling_station_id,
+                    ps.polling_station,
+                    ps.polling_address,
+                    t.taluka AS taluka_name,
+                    e.full_name AS operator_name
+                FROM
+                    polling_stations ps
+                LEFT JOIN
+                    taluka t ON ps.taluka = t.id
+                LEFT JOIN
+                    employees e ON ps.operator = e.id;
+                        
+        `;
+       
+        const { rows } = await pool.query(query);
         res.status(200).json(rows);
     }catch(err){
         res.status(500).json({ error: 'Internal Server Error' });
@@ -106,6 +145,28 @@ app.post('/registerPollingStation',authenticateToken,async (req,res)=>{
         const PS_address = result.rows[0].polling_station;
         res.status(201).json({ message: 'Employee registered successfully.', name: PS_address,done:true });
         console.log("$ Polling Station registered with PS name : " + PS_address)
+    }catch(e){
+        console.log("error occured : "+e)
+        res.status(201).json({ message: 'Employee not registered.',done:false });
+
+    }
+})
+
+
+app.post('/registerCamera',authenticateToken,async (req,res)=>{
+    const {number,poll_station} = req.body
+    try{
+
+        const poll_id = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[poll_station])
+       
+        const result = await pool.query(
+            `INSERT INTO cameras (serial_number, stream_url, PS, is_active) VALUES ($1, $2, $3, $4) RETURNING serial_number`,
+            [number, `rmtp://122.170.240.142:1935/live/${number}`,poll_id.rows[0] ,false]
+        );
+
+        const serial_number = result.rows[0].serial_number;
+        res.status(201).json({ message: 'Camera registered successfully.', name: serial_number,done:true });
+        console.log("$ Camera registered with model name : " + serial_number)
     }catch(e){
         console.log("error occured : "+e)
         res.status(201).json({ message: 'Employee not registered.',done:false });
