@@ -1,12 +1,7 @@
-CREATE TABLE locations(
-    id SERIAL PRIMARY KEY,
-    loc_name TEXT
-);
-
 CREATE TABLE taluka(
     id SERIAL PRIMARY KEY,
     taluka TEXT
-)
+);
 
 CREATE TABLE employees(
     id SERIAL PRIMARY KEY,
@@ -19,19 +14,27 @@ CREATE TABLE employees(
 CREATE TABLE polling_stations(
     id SERIAL PRIMARY KEY,
     polling_station TEXT,
-    polling_profile TEXT,
+    polling_address TEXT,
     taluka INTEGER,
     FOREIGN KEY(taluka) REFERENCES taluka(id)
 );
 
-CREATE TABLE camera (
+CREATE TABLE cameras (
     id SERIAL PRIMARY KEY,
-    loc_name INTEGER,
-    FOREIGN KEY (loc_name) REFERENCES locations(id),
     PS INTEGER,
     FOREIGN KEY (PS) REFERENCES polling_stations(id),
     serial_number TEXT,
     sent_at TEXT,
     removed_at TEXT,
-    is_active BOOLEAN
+    is_active BOOLEAN,
+    supervisor INTEGER,
+    FOREIGN KEY (supervisor) REFERENCES employees(id)
+);
+
+CREATE TABLE streams(
+    id SERIAL PRIMARY KEY,
+    camera INTEGER,
+    FOREIGN KEY(camera) REFERENCES cameras(id),
+    start_time TEXT,
+    end_time TEXT
 );

@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('./database'); 
+require('dotenv').config();
 const { comparePassword } = require('./auth'); 
 const app = express();
 const port = process.env.ADMIN_PORT;
@@ -25,28 +26,6 @@ async function authUser(req, res, next) {
         next();
     });
 }
-
-async function authAdmin(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
-     jwt.verify(token, secretKey, async (err, user) => {
-        if (err) {
-            return res.status(403).json({ error: 'Invalid token'+err });
-        }
-
-        if(user.admin) {
-            next();
-        }
-        else  {
-            return res.status(403).json({ error: 'Not authorized' });
-        } 
-    });
-}
-
 
 
 app.get('/employees',authUser,async (req, res)=>{

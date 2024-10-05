@@ -1,4 +1,5 @@
 <script>
+    import {onMount} from 'svelte'
     let admin = true;
     let viewMode = 0;
     let serialNumber = '';
@@ -7,6 +8,46 @@
     let isAdmin=false
     let editCam=false
     let editEmployee=false
+    let url='http://localhost:xyz/'
+
+    async function authenticateToken() {
+    const token = localStorage.getItem('authToken'); 
+    try {
+        const response = await fetch(`${url}/authenticateToken`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,  // Bearer token for authorization
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Check if the response is not OK
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                // Redirect to login if unauthorized
+                window.location.href = '/login';
+                return;
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        }
+
+        const data = await response.json();
+
+        // If there's an error in the response data
+        if (data.error) {
+            window.location.href = '/login';
+        } else {
+            // Assuming `isAdmin` is declared/defined somewhere in your code
+            isAdmin = data.isAdmin;
+        }
+
+    } catch (e) {
+        window.alert("An error occurred: " + e.message);
+    }
+}
+
+
     // Function to handle camera initialization
     async function registerCamera() {
         // Implementation for registering the camera (e.g., storing serial number or location)
@@ -24,6 +65,11 @@
     function saveChanges(){
 
     }
+
+
+    onMount(()=>{
+        authenticateToken()
+    })
 </script>
 
 <div class="{editCam?"flex":"hidden"} p-10 flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
