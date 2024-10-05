@@ -93,7 +93,58 @@ app.get('/getCameras',authenticateToken,async (req,res)=>{
                     streams s ON c.id = s.camera;
 
                         
-        `;       
+        `;    
+      
+      
+      
+        // const query = `
+        //     SELECT
+        //         c.id AS camera_id,                 
+        //         c.serial_number,                   
+        //         t.taluka AS taluka_name,           
+        //         c.stream_url,                      
+        //         ps.polling_station,                
+        //         e.full_name AS operator_name,      
+        //         e.phone_number AS operator_phone,  
+        //         c.is_active,                       
+        //         ps.polling_address                 
+        //     FROM
+        //         polling_stations ps
+        //     LEFT JOIN
+        //         taluka t ON ps.taluka = t.id
+        //     LEFT JOIN
+        //         employees e ON ps.operator = e.id
+        //     LEFT JOIN
+        //         cameras c ON ps.id = c.PS
+        //     WHERE
+        //         c.id IS NOT NULL; 
+        // `;
+        
+
+        // const query = `
+        //     SELECT
+        //     cameras.id AS camera_id,    
+        //     cameras.serial_number,
+        //     taluka.taluka AS taluka_name,
+        //     cameras.stream_url,
+        //     polling_stations.polling_station,
+        //     employees.full_name AS operator_name,
+        //     employees.phone_number AS operator_phone,
+        //     cameras.is_active,
+        //     polling_stations.polling_address
+        //     FROM
+        //     cameras
+        //     JOIN polling_stations ON cameras.PS = polling_stations.id
+        //     JOIN employees ON polling_stations.operator = employees.id
+        //     JOIN taluka ON polling_stations.taluka = taluka.id
+        //     WHERE
+        //     cameras.id IS NOT NULL
+        //     AND cameras.serial_number IS NOT NULL
+        //     AND cameras.stream_url IS NOT NULL;
+
+        // `
+
+
         const { rows } = await pool.query(query);
 
         res.status(200).json(rows);

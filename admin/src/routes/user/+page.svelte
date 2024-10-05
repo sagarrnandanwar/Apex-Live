@@ -410,33 +410,42 @@
             <div class="w-full rounded-xl  flex flex-col h-auto text-2xl mt-10 ">
                 {#if viewMode==0}
                     
+                
                 <div class="overflow-x-auto rounded-xl">
                     <table class="min-w-full bg-white shadow-md rounded-lg">
                       <thead>
                         <tr class="bg-gray-800 text-white text-left">
                           <th class="py-2 px-4">Camera ID</th>
                           <th class="py-2 px-4">Serial Number</th>
+                          <th class="py-2 px-4">Taluka Name</th>
                           <th class="py-2 px-4">Stream URL</th>
                           <th class="py-2 px-4">Polling Station</th>
                           <th class="py-2 px-4">Operator</th>
+                          <th class="py-2 px-4">Operator Mobile Number</th>
                           <th class="py-2 px-4">Is Active</th>
+                          <th class="py-2 px-4">Polling Station Address</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {#each cameraList as camera (camera.id)}
+                        {#each cameraList as camera (camera.camera_id)}
                           <tr class="border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{camera.camera_id}</td>
                             <td class="py-2 px-4">{camera.serial_number}</td>
-                            <td class="py-2 px-4"><a href={camera.stream_url} target="_blank" class="text-blue-500 hover:underline">{camera.stream_url}</a></td>
+                            <td class="py-2 px-4">{camera.taluka_name}</td>
+                            <td class="py-2 px-4">
+                              <a href={camera.stream_url} target="_blank" class="text-blue-500 hover:underline">{camera.stream_url}</a>
+                            </td>
                             <td class="py-2 px-4">{camera.polling_station}</td>
                             <td class="py-2 px-4">{camera.operator_name}</td>
+                            <td class="py-2 px-4">{camera.operator_phone}</td>
                             <td class="py-2 px-4">{camera.is_active ? 'Active' : 'Inactive'}</td>
+                            <td class="py-2 px-4">{camera.polling_address}</td>
                           </tr>
                         {/each}
                       </tbody>
                     </table>
                   </div>
-                    
+                  
 
                 {:else if viewMode==1}
                     <div class="grid grid-rows-2 grid-cols-2 w-full gap-10 rounded-xl justify-around h-full">
