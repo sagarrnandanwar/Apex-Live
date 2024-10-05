@@ -1,5 +1,6 @@
 <script>
     import {onMount} from 'svelte'
+    import Swal from 'sweetalert2';
 
     let viewMode = 0;
     let projectName=''
@@ -39,6 +40,23 @@
     const getToken = () => {
         return localStorage.getItem('authToken'); 
     };
+
+
+
+    function showSuccessAlert(message) {
+        Swal.fire({
+            title: 'Success!',
+            text: message,
+            icon: 'success',
+            confirmButtonText: 'Okay',
+            timer: 1000, 
+            showConfirmButton: true,
+        });
+    }
+
+
+
+
 
 
     async function fetchPollingStations() {
@@ -160,9 +178,10 @@
 
             if (response.ok) {
                 if(data.done){
-                    alert("Polling Station registered! with name : " + data.name)
-                    pollingStationNumber=''          
-                    getInfo()          
+                    pollingStationNumber=''   
+                    showSuccessAlert("Polling Station registered! with name : " + data.name)
+                    getInfo()     
+                         
                 }
             } else {
                 alert(data.error || 'Registeration failed');
@@ -194,8 +213,8 @@
 
             if (response.ok) {
                 if(data.done){
-                    alert("Taluka registered! with name : " + data.name)
                     talukaName=''
+                    showSuccessAlert("Taluka registered! with name : " + data.name)
                     getInfo()          
 
                 }
@@ -232,9 +251,9 @@
 
             if (response.ok) {
                 if(data.done){
-                    alert("Camera registered! with model number : " + data.name)
                     serialNumber=''
                     getInfo()
+                    showSuccessAlert("Camera registered! with model number : " + data.name)
                 }
             } else {
                 alert(data.error || 'Registeration failed');
@@ -267,11 +286,11 @@
 
             if (response.ok) {
                 if(data.done){
-                    alert("Employee registered! with name : " + data.name)
                     employeeName=''
                     employeePassword=''
                     employeeNumber=''
                     employeeAdmin=false
+                    showSuccessAlert("Employee registered! with name : " + data.name)
                     getInfo()          
 
                 }
@@ -328,6 +347,7 @@
         fetchEmployees()
         fetchTalukas()
         fetchCameras()
+        showSuccessAlert('Fetched info successful!')
     }
 
     function openCamera(id){
@@ -347,6 +367,7 @@
         token=getToken()
         authenticateToken();
         getInfo()
+        showSuccessAlert('Login successful!')
     })
 </script>
 
