@@ -66,83 +66,24 @@ app.get('/getTalukas',authenticateToken,async (req,res)=>{
 app.get('/getCameras',authenticateToken,async (req,res)=>{
     try{
         const query = `        
-                SELECT
-                    ps.id AS polling_station_id,
-                    ps.polling_station,
-                    ps.polling_address,
-                    t.taluka AS taluka_name,
-                    e.full_name AS operator_name,
-                    c.id AS camera_id,
-                    c.serial_number,
-                    c.stream_url,
-                    c.sent_at,
-                    c.removed_at,
-                    c.is_active,
-                    s.id AS stream_id,
-                    s.start_time,
-                    s.end_time
-                FROM
-                    polling_stations ps
-                LEFT JOIN
-                    taluka t ON ps.taluka = t.id
-                LEFT JOIN
-                    employees e ON ps.operator = e.id
-                LEFT JOIN
-                    cameras c ON ps.id = c.PS
-                LEFT JOIN
-                    streams s ON c.id = s.camera;
-
-                        
+            SELECT 
+            cameras.id AS "Camera ID",
+            cameras.serial_number AS "Serial Number",
+            taluka.taluka AS "Taluka Name",
+            cameras.stream_url AS "Stream URL",
+            polling_stations.polling_station AS "Polling Station",
+            employees.full_name AS "Operator",
+            employees.phone_number AS "Operator Mobile Number",
+            cameras.is_active AS "Is Active",
+            polling_stations.polling_address AS "Polling Station Address"
+            FROM cameras
+            LEFT JOIN polling_stations ON cameras.PS = polling_stations.id
+            LEFT JOIN employees ON polling_stations.operator = employees.id
+            LEFT JOIN taluka ON polling_stations.taluka = taluka.id;
         `;    
       
       
-      
-        // const query = `
-        //     SELECT
-        //         c.id AS camera_id,                 
-        //         c.serial_number,                   
-        //         t.taluka AS taluka_name,           
-        //         c.stream_url,                      
-        //         ps.polling_station,                
-        //         e.full_name AS operator_name,      
-        //         e.phone_number AS operator_phone,  
-        //         c.is_active,                       
-        //         ps.polling_address                 
-        //     FROM
-        //         polling_stations ps
-        //     LEFT JOIN
-        //         taluka t ON ps.taluka = t.id
-        //     LEFT JOIN
-        //         employees e ON ps.operator = e.id
-        //     LEFT JOIN
-        //         cameras c ON ps.id = c.PS
-        //     WHERE
-        //         c.id IS NOT NULL; 
-        // `;
-        
 
-        // const query = `
-        //     SELECT
-        //     cameras.id AS camera_id,    
-        //     cameras.serial_number,
-        //     taluka.taluka AS taluka_name,
-        //     cameras.stream_url,
-        //     polling_stations.polling_station,
-        //     employees.full_name AS operator_name,
-        //     employees.phone_number AS operator_phone,
-        //     cameras.is_active,
-        //     polling_stations.polling_address
-        //     FROM
-        //     cameras
-        //     JOIN polling_stations ON cameras.PS = polling_stations.id
-        //     JOIN employees ON polling_stations.operator = employees.id
-        //     JOIN taluka ON polling_stations.taluka = taluka.id
-        //     WHERE
-        //     cameras.id IS NOT NULL
-        //     AND cameras.serial_number IS NOT NULL
-        //     AND cameras.stream_url IS NOT NULL;
-
-        // `
 
 
         const { rows } = await pool.query(query);
@@ -157,18 +98,18 @@ app.get('/getCameras',authenticateToken,async (req,res)=>{
 app.get('/getPollingStation',authenticateToken,async (req,res)=>{
     try{
         const query = `        
-                SELECT
+                    SELECT
                     ps.id AS polling_station_id,
                     ps.polling_station,
                     ps.polling_address,
                     t.taluka AS taluka_name,
                     e.full_name AS operator_name
-                FROM
-                    polling_stations ps
-                LEFT JOIN
-                    taluka t ON ps.taluka = t.id
-                LEFT JOIN
-                    employees e ON ps.operator = e.id;
+                    FROM
+                        polling_stations ps
+                    LEFT JOIN
+                        taluka t ON ps.taluka = t.id
+                    LEFT JOIN
+                        employees e ON ps.operator = e.id;
                         
         `;
        
@@ -209,7 +150,8 @@ app.post('/registerCamera',authenticateToken,async (req,res)=>{
     try{
 
         const poll_id = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[poll_station])
-       
+       console.log(poll_id.rows[0])
+       console.log(poll_id)
         const result = await pool.query(
             `INSERT INTO cameras (serial_number, stream_url, PS, is_active) VALUES ($1, $2, $3, $4) RETURNING serial_number`,
             [number, `rmtp://122.170.240.142:1935/live/${number}`,poll_id.rows[0] ,false]
