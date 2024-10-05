@@ -11,6 +11,10 @@
     let talukaName=''
 
 
+    let pollingStationNumber=''
+    let pollingStationOperator=''
+    let pollingStationAddress=''
+    let pollingStationTaluka=''
 
 
     let employeeList=[]
@@ -33,6 +37,30 @@
         return localStorage.getItem('authToken'); 
     };
 
+
+    async function fetchPollingStations() {
+       
+       try {
+           const response = await fetch(`${url}/getPollingStation`, {
+               method: 'GET',
+               headers: {
+                   'Authorization': `Bearer ${token}`,
+                   'Content-Type': 'application/json'
+               }
+           });
+
+           if (!response.ok) {
+               const { error } = await response.json();
+               errorMessage = error; // Display the error message from the server
+               return;
+           }
+
+           pollingStationList = await response.json();
+       } catch (error) {
+           console.error('Error fetching employees:', error);
+           errorMessage = 'An error occurred while fetching employees.';
+       }
+   }
 
     async function fetchTalukas() {
        
@@ -82,6 +110,46 @@
         }
     }
 
+
+
+    async function registerPollingStation(){
+
+        if (pollingStationNumber=='' || !pollingStationOperator || !pollingStationAddress || !pollingStationTaluka||pollingStationNumber==''||pollingStationOperator==''||pollingStationAddress==''||pollingStationTaluka=='') {
+            alert("Missing some info for taluka");
+            return;
+        }
+
+        try{
+
+            const response = await fetch(`${url}/registerPollingStation`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                     number:pollingStationNumber,
+                     operator:pollingStationOperator,
+                     address:pollingStationAddress,
+                     taluka:pollingStationTaluka
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if(data.done){
+                    alert("Polling Station registered! with name : " + data.name)
+                    pollingStationNumber=''                    
+                }
+            } else {
+                alert(data.error || 'Registeration failed');
+            }
+
+        }catch(err){
+
+        }
+    }
 
 
     async function registerTaluka(){
@@ -201,6 +269,7 @@
     function getInfo(){
         fetchEmployees()
         fetchTalukas()
+        fetchPollingStations()
     }
 
     function openCamera(id){
@@ -271,13 +340,19 @@
 
 
 <div class="flex flex-col bg-gray-200" style="min-height:200svh;width:100%">
-    <div class="w-full py-10 h-full rounded-xl">
-        <div class=" flex flex-row gap-5 text-2xl pl-10 ml-10">
-            <button on:click={()=>{viewMode=0}} class="bg-{viewMode==0?"green-700":"transparent"} px-7 order-1 py-2 rounded-xl text-{viewMode==0?"white":"black"} transition-all transform duration-300 {viewMode==0?"hover:bg-green-600 hover:shadow-xl hover:scale-105 text-white":""}">Cameras</button>
-            <button on:click={()=>{viewMode=2}} class="bg-{viewMode==2?"purple-700":"transparent"} px-7 order-2 py-2 rounded-xl text-{viewMode==2?"white":"black"} transition-all transform duration-300 {viewMode==2?"hover:bg-purple-600  hover:shadow-xl hover:scale-105 text-white":""}">Employees</button>
-            <button on:click={()=>{viewMode=1}} class="bg-{viewMode==1?"orange-500":"transparent"} px-7 order-0 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-orange-400  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
-            <button on:click={()=>{viewMode=3}} class="bg-{viewMode==3?"yellow-500":"transparent"} px-7 order-3 py-2 rounded-xl text-{viewMode==3?"white":"black"} transition-all transform duration-300 {viewMode==3?"hover:bg-yellow-500  hover:shadow-xl hover:scale-105 text-white":""}">Polling Stations</button>
-            <button on:click={()=>{viewMode=4}} class="bg-{viewMode==4?"red-500":"transparent"} px-7 order-4 py-2 rounded-xl text-{viewMode==4?"white":"black"} transition-all transform duration-300 {viewMode==4?"hover:bg-red-500  hover:shadow-xl hover:scale-105 text-white":""}">Talukas</button>
+    <div class="w-full py-10 h-full rounded-xl px-20 text-2xl">
+        <div class="w-full flex flex-row justify-between">
+            <div class=" flex flex-row gap-5  pl-5 ml-10">
+                <button on:click={()=>{viewMode=0}} class="bg-{viewMode==0?"green-700":"transparent"} px-7 order-1 py-2 rounded-xl text-{viewMode==0?"white":"black"} transition-all transform duration-300 {viewMode==0?"hover:bg-green-600 hover:shadow-xl hover:scale-105 text-white":""}">Cameras</button>
+                <button on:click={()=>{viewMode=2}} class="bg-{viewMode==2?"purple-700":"transparent"} px-7 order-2 py-2 rounded-xl text-{viewMode==2?"white":"black"} transition-all transform duration-300 {viewMode==2?"hover:bg-purple-600  hover:shadow-xl hover:scale-105 text-white":""}">Employees</button>
+                <button on:click={()=>{viewMode=1}} class="bg-{viewMode==1?"orange-500":"transparent"} px-7 order-0 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-orange-400  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
+                <button on:click={()=>{viewMode=3}} class="bg-{viewMode==3?"yellow-500":"transparent"} px-7 order-3 py-2 rounded-xl text-{viewMode==3?"white":"black"} transition-all transform duration-300 {viewMode==3?"hover:bg-yellow-500  hover:shadow-xl hover:scale-105 text-white":""}">Polling Stations</button>
+                <button on:click={()=>{viewMode=4}} class="bg-{viewMode==4?"red-500":"transparent"} px-7 order-4 py-2 rounded-xl text-{viewMode==4?"white":"black"} transition-all transform duration-300 {viewMode==4?"hover:bg-red-500  hover:shadow-xl hover:scale-105 text-white":""}">Talukas</button>
+            </div>
+            
+                <button on:click={getInfo} class="bg-pink-500 px-7 order-4 py-2 rounded-xl text-white transition-all transform duration-300 hover:bg-pink-500  hover:shadow-xl hover:scale-105 text-white">↻ fetch data</button>
+
+           
         </div>
 
         <div class="w-full flex flex-row h-auto px-10">
@@ -326,15 +401,28 @@
                             <div class="mx-auto mt-5 mb-5 text-4xl ">Register Polling Station</div>
 
                             <div class="ml-10 mt-5 my-2">Polling Station Number :</div>
-                            <input bind:value={projectName} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Polling Station">
+                            <input bind:value={pollingStationNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Polling Station">
                             <div class="ml-10 my-2">Operator :</div>
-                            <input class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Operator">
-                            <div class="ml-10 mt-5 my-2">Taluka :</div>
-                            <input bind:value={serialNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
-                            <div class="ml-10 mt-5 my-2">Address :</div>
-                            <input bind:value={serialNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
+
+                            <select bind:value={pollingStationOperator} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
+                                {#each employeeList as employee}
+                                    <option>{employee.full_name}</option>
+                                {/each}
+                            </select>
+
                             
-                            <button on:click={registerCamera} class="w-1/4 mx-auto mt-10 mb-4  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-blue-500  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
+                            <div class="ml-10 mt-5 my-2">Taluka :</div>
+                            <select bind:value={pollingStationTaluka} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
+                                {#each talukasList as taluka}
+                                    <option>{taluka.taluka}</option>
+                                {/each}
+                            </select>
+                            
+                            <div class="ml-10 mt-5 my-2">Address :</div>
+                            
+                            <input bind:value={pollingStationAddress} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
+                            
+                            <button on:click={registerPollingStation} class="w-1/4 mx-auto mt-10 mb-4  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-blue-500  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
                                              
                         </div>
 
@@ -376,15 +464,34 @@
 
                 {:else if viewMode==3}
 
-                <p>3</p>
+                <div class="flex flex-wrap gap-3 w-full bg-gray-200 p-10 rounded-2xl">
+                    {#each pollingStationList as polls}
+                        <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-row gap-3 p-5 rounded-2xl bg-white">   
+                            <div class="flex flex-row justify-between">
+                                <div class="flex flex-row">
+                                    <div>{polls.id})  </div>
+                                    <div>{polls.polling_station}</div>
+                                </div>
+                            </div>
+                        </button>
+                    {/each}
+                    <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-row gap-3 p-5 rounded-2xl bg-white">   
+                        <div class="flex flex-row justify-between">
+                            <div class="flex flex-row gap-4">
+                                <div>1) </div>
+                                <div>ADDAWDAWD</div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
 
                 
                 {:else if viewMode==4}
 
                 <div class="flex flex-wrap gap-3 w-full bg-gray-200 p-10 rounded-2xl">
                     {#each talukasList as taluka}
-                        <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-col gap-3 p-5 rounded-2xl bg-white">   
-                            <div>{taluka.id}  </div>
+                        <button class="w-1/4 transform hover:scale-95 hover:shadow-xl duration-300 transition-all flex flex-row gap-3 p-5 rounded-2xl bg-white">   
+                            <div>{taluka.id})  </div>
                             <div>{taluka.taluka}</div>
                         </button>
                     {/each}

@@ -62,6 +62,59 @@ app.get('/getTalukas',authenticateToken,async (req,res)=>{
     }
 })
 
+
+app.get('/getPollingStation',authenticateToken,async (req,res)=>{
+    try{
+            const query = `
+            SELECT 
+                ps.id, 
+                ps.polling_station, 
+                ps.polling_address, 
+                t.taluka_name, 
+                e.full_name AS operator_name 
+            FROM 
+                polling_stations ps
+            JOIN 
+                employees e ON ps.operator = e.id
+            JOIN 
+                taluka t ON ps.taluka = t.id;
+           `;
+        
+        const { rows } = await pool.query(query);
+        res.status(200).json(rows);
+    }catch(err){
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+
+
+app.post('/registerPollingStation',authenticateToken,async (req,res)=>{
+    const {number,operator,address,taluka} = req.body
+    console.log(`${number} ${operator} ${address} ${taluka}`)
+    try{
+
+        const operator_id = await pool.query('SELECT id FROM employees WHERE full_name = $1',[operator])
+        const taluka_id = await pool.query('SELECT id FROM taluka WHERE taluka = $1',[taluka])
+        console.log(operator_id.rows[0].id)
+        console.log(taluka_id.rows[0].id)
+
+        const result = await pool.query(
+            'INSERT INTO polling_stations (polling_station, polling_address, taluka, operator) VALUES ($1, $2, $3, $4) RETURNING polling_station',
+            [number,address,taluka_id.rows[0].id,operator_id.rows[0].id]
+        );
+
+        const PS_address = result.rows[0].polling_station;
+        res.status(201).json({ message: 'Employee registered successfully.', name: PS_address,done:true });
+        console.log("$ Polling Station registered with PS name : " + PS_address)
+    }catch(e){
+        console.log("error occured : "+e)
+        res.status(201).json({ message: 'Employee not registered.',done:false });
+
+    }
+})
+
+
 app.post('/registerEmployee',authenticateToken,async (req,res)=>{
     const {name,password,number,isAdmin} = req.body
     
