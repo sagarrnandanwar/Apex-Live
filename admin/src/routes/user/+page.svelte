@@ -427,7 +427,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {#each cameraList as camera (camera.camera_id)}
+                        {#each cameraList as camera}
                           <tr class="border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{camera.camera_id}</td>
                             <td class="py-2 px-4">{camera.serial_number}</td>
@@ -441,6 +441,7 @@
                             <td class="py-2 px-4">{camera.is_active ? 'Active' : 'Inactive'}</td>
                             <td class="py-2 px-4">{camera.polling_address}</td>
                           </tr>
+                     
                         {/each}
                       </tbody>
                     </table>

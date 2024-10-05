@@ -67,24 +67,21 @@ app.get('/getCameras',authenticateToken,async (req,res)=>{
     try{
         const query = `        
             SELECT 
-            cameras.id AS "Camera ID",
-            cameras.serial_number AS "Serial Number",
-            taluka.taluka AS "Taluka Name",
-            cameras.stream_url AS "Stream URL",
-            polling_stations.polling_station AS "Polling Station",
-            employees.full_name AS "Operator",
-            employees.phone_number AS "Operator Mobile Number",
-            cameras.is_active AS "Is Active",
-            polling_stations.polling_address AS "Polling Station Address"
+            cameras.id AS "camera_id",
+            cameras.serial_number AS "serial_number",
+            taluka.taluka AS "taluka_name",
+            cameras.stream_url AS "stream_url",
+            polling_stations.polling_station AS "polling_station",
+            employees.full_name AS "operator_name",
+            employees.phone_number AS "operator_phone",
+            cameras.is_active AS "is_active",
+            polling_stations.polling_address AS "polling_address"
             FROM cameras
             LEFT JOIN polling_stations ON cameras.PS = polling_stations.id
             LEFT JOIN employees ON polling_stations.operator = employees.id
             LEFT JOIN taluka ON polling_stations.taluka = taluka.id;
         `;    
-      
-      
-
-
+    
 
         const { rows } = await pool.query(query);
 
@@ -147,14 +144,20 @@ app.post('/registerPollingStation',authenticateToken,async (req,res)=>{
 
 app.post('/registerCamera',authenticateToken,async (req,res)=>{
     const {number,poll_station} = req.body
+    const trimmed_poll_station = poll_station.trim();
+
     try{
 
-        const poll_id = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[poll_station])
-       console.log(poll_id.rows[0])
-       console.log(poll_id)
+        const poll_id = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[trimmed_poll_station])
+     
+       if (poll_id.rowCount === 0) {
+        console.log(`-> Polling station "${poll_station}" not found.`);
+        return res.status(404).json({ message: 'Polling station not found', done: false });
+    }
+
         const result = await pool.query(
             `INSERT INTO cameras (serial_number, stream_url, PS, is_active) VALUES ($1, $2, $3, $4) RETURNING serial_number`,
-            [number, `rmtp://122.170.240.142:1935/live/${number}`,poll_id.rows[0] ,false]
+            [number, `rmtp://122.170.240.142:1935/live/${number}`,poll_id.rows[0].id ,false]
         );
 
         const serial_number = result.rows[0].serial_number;
