@@ -1,13 +1,14 @@
 <script>
     import {onMount} from 'svelte'
-    let admin = true;
+
     let viewMode = 0;
     let projectName=''
-    let emailID=''
     let isAdmin=false
     let editCam=false
     let editEmployee=false
-    let talukaName=''
+    let talukaName=''    
+  
+
 
 
     let pollingStationNumber=''
@@ -160,7 +161,8 @@
             if (response.ok) {
                 if(data.done){
                     alert("Polling Station registered! with name : " + data.name)
-                    pollingStationNumber=''                    
+                    pollingStationNumber=''          
+                    getInfo()          
                 }
             } else {
                 alert(data.error || 'Registeration failed');
@@ -194,6 +196,8 @@
                 if(data.done){
                     alert("Taluka registered! with name : " + data.name)
                     talukaName=''
+                    getInfo()          
+
                 }
             } else {
                 alert(data.error || 'Registeration failed');
@@ -230,6 +234,7 @@
                 if(data.done){
                     alert("Camera registered! with model number : " + data.name)
                     serialNumber=''
+                    getInfo()
                 }
             } else {
                 alert(data.error || 'Registeration failed');
@@ -267,6 +272,8 @@
                     employeePassword=''
                     employeeNumber=''
                     employeeAdmin=false
+                    getInfo()          
+
                 }
             } else {
                 alert(data.error || 'Registeration failed');
@@ -342,6 +349,11 @@
         getInfo()
     })
 </script>
+
+
+<div>
+    
+</div>
 
 <div class="{editCam?"flex":"hidden"} p-10 flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
     <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
@@ -463,7 +475,14 @@
                                     {/each}
                                 </select>
                             <div class="ml-10 mt-5 my-2">Serial Number :</div>
-                            <input bind:value={serialNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
+                            <input
+                            bind:value={serialNumber} 
+                            on:keydown={(event) => {
+                                if (event.key === 'Enter') {
+                                    registerCamera();
+                                }
+                            }} 
+                            class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
                             
                             <button on:click={registerCamera} class="w-1/4 mx-auto mt-10 mb-4  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-blue-500  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
                                              
