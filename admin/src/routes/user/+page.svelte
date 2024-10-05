@@ -11,41 +11,40 @@
     let url='http://localhost:xyz/'
 
     async function authenticateToken() {
-    const token = localStorage.getItem('authToken'); 
-    try {
-        const response = await fetch(`${url}/authenticateToken`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,  // Bearer token for authorization
-                'Content-Type': 'application/json'
-            }
-        });
+        const token = localStorage.getItem('authToken'); 
+        if (!token) {
+            window.location = '/login'; // Redirect to login if no token
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${url}/authenticateToken`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Send token in authorization header
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        // Check if the response is not OK
-        if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-                // Redirect to login if unauthorized
-                window.location.href = '/login';
-                return;
+            const data = await response.json();
+
+            if (response.ok) {
+                // Token is valid; you can proceed to the user page or show user data
+                console.log('Authenticated user:', data);
+                if (data.isAdmin) {
+                    // Handle admin-specific logic
+                    console.log("User is an admin");
+                }
+                window.location.href = '/user'; // Redirect to user page or dashboard
             } else {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                alert(data.error || 'Token is invalid');
+                window.location = '/login'; // Redirect to login if token is invalid
             }
+        } catch (error) {
+            console.error('Error during token authentication:', error);
+            alert("An error occurred while authenticating the token.");
         }
-
-        const data = await response.json();
-
-        // If there's an error in the response data
-        if (data.error) {
-            window.location.href = '/login';
-        } else {
-            // Assuming `isAdmin` is declared/defined somewhere in your code
-            isAdmin = data.isAdmin;
-        }
-
-    } catch (e) {
-        window.alert("An error occurred: " + e.message);
     }
-}
 
 
     // Function to handle camera initialization

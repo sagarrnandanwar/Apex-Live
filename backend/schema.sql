@@ -1,3 +1,9 @@
+DROP TABLE IF EXISTS streams CASCADE;
+DROP TABLE IF EXISTS cameras CASCADE;
+DROP TABLE IF EXISTS polling_stations CASCADE;
+DROP TABLE IF EXISTS employees CASCADE;
+DROP TABLE IF EXISTS taluka CASCADE;
+
 CREATE TABLE taluka(
     id SERIAL PRIMARY KEY,
     taluka TEXT
@@ -6,7 +12,7 @@ CREATE TABLE taluka(
 CREATE TABLE employees(
     id SERIAL PRIMARY KEY,
     full_name TEXT,
-    hashed_password TEXT,
+    pass TEXT,
     is_admin INTEGER,
     phone_number TEXT
 );
