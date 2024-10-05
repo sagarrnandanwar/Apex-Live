@@ -22,6 +22,8 @@ CREATE TABLE polling_stations(
     polling_station TEXT,
     polling_address TEXT,
     taluka INTEGER,
+    operator INTEGER,
+    FOREIGN KEY (operator) REFERENCES employees(id),
     FOREIGN KEY(taluka) REFERENCES taluka(id)
 );
 
@@ -30,11 +32,10 @@ CREATE TABLE cameras (
     PS INTEGER,
     FOREIGN KEY (PS) REFERENCES polling_stations(id),
     serial_number TEXT,
+    stream_url TEXT,
     sent_at TEXT,
     removed_at TEXT,
-    is_active BOOLEAN,
-    supervisor INTEGER,
-    FOREIGN KEY (supervisor) REFERENCES employees(id)
+    is_active BOOLEAN
 );
 
 CREATE TABLE streams(

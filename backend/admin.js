@@ -14,10 +14,13 @@ app.use(cors())
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    let token = authHeader && authHeader.split(' ')[1];
+
+
 
     if (!token) {
-        return res.status(401).json({ error: 'Token is missing' }); // Return error message
+        token=req.token
+        // return res.status(401).json({ error: 'Token is missing' }); // Return error message
     }
 
     jwt.verify(token, secretKey, (err, user) => {
@@ -36,9 +39,69 @@ app.get('/authenticateToken', authenticateToken, (req, res) => {
     res.status(200).json({ 
         message: 'Token is valid', 
         error: req.error, 
-        isAdmin: req.user.admin // Send the admin status
+        isAdmin: req.user.admin 
     });
 });
+
+app.get('/getEmployees',authenticateToken,async (req,res)=>{
+    try{
+        const { rows } = await pool.query('SELECT id, full_name, is_admin,phone_number FROM employees');
+        res.status(200).json(rows);
+    }catch(err){
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+app.get('/getTalukas',authenticateToken,async (req,res)=>{
+    try{
+        const { rows } = await pool.query('SELECT id, taluka FROM taluka');
+
+        res.status(200).json(rows);
+    }catch(err){
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+app.post('/registerEmployee',authenticateToken,async (req,res)=>{
+    const {name,password,number,isAdmin} = req.body
+    
+    try{
+
+        const result = await pool.query(
+            'INSERT INTO employees (full_name, pass, is_admin, phone_number) VALUES ($1, $2, $3, $4) RETURNING full_name',
+            [name, password, isAdmin ? 1 : 0, number]
+        );
+
+        const employeeName = result.rows[0].full_name;
+        res.status(201).json({ message: 'Employee registered successfully.', name: employeeName,done:true });
+        console.log("$ User registered with employee name : " + employeeName)
+    }catch(e){
+        console.log("error occured : "+e)
+        res.status(201).json({ message: 'Employee not registered.',done:false });
+
+    }
+})
+
+
+app.post('/registerTaluka',authenticateToken,async (req,res)=>{
+    const {name} = req.body
+    
+    try{
+
+        const result = await pool.query(
+            'INSERT INTO taluka (taluka) VALUES ($1) RETURNING taluka',
+            [name]
+        );
+
+        const talukaName = result.rows[0].taluka;
+        res.status(201).json({ message: 'Employee registered successfully.', name: talukaName,done:true });
+        console.log("$ Taluka registered with name : " + talukaName)
+    }catch(e){
+        console.log("error occured : "+e)
+        res.status(201).json({ message: 'Employee not registered.',done:false });
+
+    }
+})
 
 
 app.post('/login', async (req, res) => {

@@ -1,40 +1,37 @@
 <script>
     import { onMount } from 'svelte';
-    let url = 'http://localhost:2000/';
+    let url = 'http://localhost:2000';
 
     async function authenticateToken() {
-        const token = localStorage.getItem('authToken');
-        
-        // Check if the token is missing or empty
-        if (!token || token === "") {
-            window.location.href = '/login';
-            return; // Stop execution if there is no token
+        const token = localStorage.getItem('authToken'); 
+        if (!token) {
+            window.location = '/login'; 
+            return;
         }
-
+    
         try {
             const response = await fetch(`${url}/authenticateToken`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,  // Bearer token for authorization
+                    'Authorization': `Bearer ${token}`, // Send token in authorization header
                     'Content-Type': 'application/json'
                 }
             });
 
-            // Check if the response is JSON
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                const data = await response.json();
+            const data = await response.json();
 
-                // Redirect based on the presence of an error
-                window.location.href = data.error ? '/login' : '/user';
+            if (response.ok) {
+                // Token is valid; you can proceed to the user page or show user data
+                console.log('Authenticated user:', data);
+                window.location=data.error?'/login':'/user'
+               
             } else {
-                // Handle non-JSON responses
-                window.alert('Unexpected response format');
-                window.location.href = '/login'; // Redirect to login on unexpected format
+                alert(data.error || 'Token is invalid');
+                window.location = '/login'; // Redirect to login if token is invalid
             }
-        } catch (e) {
-            window.alert("An error occurred: " + e.message);
-            window.location.href = '/login'; // Redirect to login on error
+        } catch (error) {
+            console.error('Error during token authentication:', error);
+            alert("An error occurred while authenticating the token.");
         }
     }
 
