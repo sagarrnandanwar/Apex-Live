@@ -2,7 +2,6 @@
     import {onMount} from 'svelte'
     let admin = true;
     let viewMode = 0;
-    let serialNumber = '';
     let projectName=''
     let emailID=''
     let isAdmin=false
@@ -21,6 +20,9 @@
     let cameraList=[]
     let pollingStationList=[]
     let talukasList=[]
+
+    let cameraPollStation=''
+    let serialNumber = '';
 
     let employeeName=''
     let employeePassword=''
@@ -49,11 +51,7 @@
                }
            });
 
-           if (!response.ok) {
-               const { error } = await response.json();
-               errorMessage = error; // Display the error message from the server
-               return;
-           }
+          
 
            pollingStationList = await response.json();
        } catch (error) {
@@ -267,9 +265,10 @@
     }
 
     function getInfo(){
+        fetchPollingStations()
         fetchEmployees()
         fetchTalukas()
-        fetchPollingStations()
+        
     }
 
     function openCamera(id){
@@ -369,7 +368,11 @@
                             <div class="mx-auto mt-5 mb-5 text-4xl ">Register Camera</div>
 
                             <div class="ml-10 mt-5 my-2">Polling Station :</div>
-                            <input bind:value={projectName} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Polling Station">
+                                <select bind:value={cameraPollStation} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
+                                    {#each pollingStationList as poll}
+                                        <option>{poll.id}) {poll.polling_station}</option>
+                                    {/each}
+                                </select>
                             <div class="ml-10 mt-5 my-2">Serial Number :</div>
                             <input bind:value={serialNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
                             

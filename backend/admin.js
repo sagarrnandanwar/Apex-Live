@@ -64,6 +64,7 @@ app.get('/getTalukas',authenticateToken,async (req,res)=>{
 
 
 app.get('/getPollingStation',authenticateToken,async (req,res)=>{
+    console.log('poll')
     try{
             const query = `
             SELECT 
@@ -79,8 +80,9 @@ app.get('/getPollingStation',authenticateToken,async (req,res)=>{
             JOIN 
                 taluka t ON ps.taluka = t.id;
            `;
-        
+
         const { rows } = await pool.query(query);
+        console.log(rows)
         res.status(200).json(rows);
     }catch(err){
         res.status(500).json({ error: 'Internal Server Error' });
@@ -91,14 +93,11 @@ app.get('/getPollingStation',authenticateToken,async (req,res)=>{
 
 app.post('/registerPollingStation',authenticateToken,async (req,res)=>{
     const {number,operator,address,taluka} = req.body
-    console.log(`${number} ${operator} ${address} ${taluka}`)
     try{
 
         const operator_id = await pool.query('SELECT id FROM employees WHERE full_name = $1',[operator])
         const taluka_id = await pool.query('SELECT id FROM taluka WHERE taluka = $1',[taluka])
-        console.log(operator_id.rows[0].id)
-        console.log(taluka_id.rows[0].id)
-
+       
         const result = await pool.query(
             'INSERT INTO polling_stations (polling_station, polling_address, taluka, operator) VALUES ($1, $2, $3, $4) RETURNING polling_station',
             [number,address,taluka_id.rows[0].id,operator_id.rows[0].id]
