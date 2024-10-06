@@ -11,6 +11,8 @@
     let talukaName=''    
   
 
+    let editReference=0
+
     let editCameraSerialNumber=''
     let editCameraPollingStation=''
 
@@ -353,6 +355,72 @@
         }
     }
 
+    async function saveChanges() {
+
+        let info1='',info2='',info3='',info4='',infoTable=''
+        switch(editItem){
+            case 0:{
+                info1=editCameraPollingStation
+                info2=editCameraSerialNumber
+                infoTable='cameras'
+            }break;
+            case 1:{
+                info1=editEmployeeName
+                info2=editEmployeeNumber
+                info3=editEmployeeAdmin
+                infoTable='employees'
+
+            }break;
+            case 2:{
+                info1=editPollingStationName
+                info2=editPollingStationAddress
+                info3=editPollingStationTaluka
+                info4=editPollingStationOperator
+                infoTable='polling_stations'
+            }break;
+            case 3:{
+                info1=editTalukaName
+                infoTable='taluka'
+            }break;
+
+        }
+    
+        try {
+            const response = await fetch(`${url}/editItem/${infoTable}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                     info1: info1,
+                     info2: info2,
+                     info3: info3,
+                     info4: info4,
+                     reference: editReference
+                    }) 
+
+            });
+
+            const data = await response.json();
+
+            if(data.done){
+                showSuccessAlert("Item Altered! : " + data.info)
+                getInfo()    
+            }
+
+            if (response.ok) {
+                
+               console.log("real")
+            } else {
+                alert(data.error || 'Token is invalid');
+                window.location = '/login'; 
+            }
+        } catch (error) {
+            console.error('Error during token authentication:', error);
+            alert("An error occurred while authenticating the token.");
+        }
+    }
 
    
 
@@ -368,6 +436,7 @@
         editCameraSerialNumber=camera.serial_number
         editCameraPollingStation=camera.polling_station
         editItem=0;
+        editReference=camera.camera_id
     }
 
     function openEmployee(employee){
@@ -375,6 +444,8 @@
         editEmployeeNumber=employee.phone_number
         editEmployeeAdmin=employee.is_admin
         editItem=1;
+        editReference=employee.id
+
     }
     function openPollingStation(station){
         editPollingStationName=station.polling_station
@@ -382,16 +453,16 @@
         editPollingStationTaluka=station.taluka_name
         editPollingStationOperator=station.operator_name
         editItem=2;
+        editReference=station.polling_station_id
     }
 
     function openTaluka(taluka){
         editTalukaName=taluka.taluka
         editItem=3;
+        editReference=taluka.id
     }
 
-    function saveChanges(){
-
-    }
+    
 
     function deleteItem(){
 

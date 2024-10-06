@@ -41,6 +41,43 @@ app.get('/authenticateToken', authenticateToken, (req, res) => {
     });
 });
 
+function alterTableQuery(table,info1,info2,info3,info4,reference){
+    switch(table){
+        case 0:{
+            const polling_staions = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[info2])
+            return `
+                UPDATE ${table}
+                SET serial_number = ${info1}, PS = ${polling_staions.rows[0]}
+                WHERE id = ${reference}
+            `
+        }break;
+        case 1:{
+
+        }break;
+        case 2:{
+
+        }break;
+        case 3:{
+
+        }break;
+        
+    }
+}
+
+app.get('/editItem:table',authenticateToken,async (req,res)=>{
+    const table = req.params.table;
+    const {info1,info2,info3,info3,reference} = req.body
+    const query= alterTableQuery(table,info1,info2,info3,info4,reference);
+    
+    try{
+        const {rows} = await pool.query(query)
+        res.status(200).json({done:true,rows.rows[0]});
+
+    }catch(err){
+        console.log("error :" +err)
+   }
+})
+
 app.get('/getEmployees',authenticateToken,async (req,res)=>{
     try{
         const { rows } = await pool.query('SELECT id, full_name, is_admin,phone_number FROM employees');
