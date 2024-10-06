@@ -31,7 +31,7 @@ CREATE TABLE cameras (
     id SERIAL PRIMARY KEY,
     PS INTEGER,
     FOREIGN KEY (PS) REFERENCES polling_stations(id),
-    serial_number TEXT,
+    serial_number TEXT UNIQUE,
     stream_url TEXT,
     sent_at TEXT,
     removed_at TEXT,

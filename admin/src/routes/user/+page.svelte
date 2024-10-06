@@ -669,8 +669,8 @@
 </div>
 
 <div class="flex flex-col bg-gray-200" style="min-height:200svh;width:100%">
-    <div class="w-full py-10 h-full rounded-xl px-20 text-2xl">
-        <div class="w-full flex flex-row justify-between">
+    <div class="w-full py-3 h-full rounded-xl px-10 text-2xl">
+        <div class="w-full flex flex-row justify-between px-10 pt-10">
             <div class=" flex flex-row gap-5  pl-5 ml-10">
                 <button on:click={()=>{viewMode=0}} class="bg-{viewMode==0?"green-700":"transparent"} px-7 order-1 py-2 rounded-xl text-{viewMode==0?"white":"black"} transition-all transform duration-300 {viewMode==0?"hover:bg-green-600 hover:shadow-xl hover:scale-105 text-white":""}">Cameras</button>
                 <button on:click={()=>{viewMode=2}} class="bg-{viewMode==2?"purple-700":"transparent"} px-7 order-2 py-2 rounded-xl text-{viewMode==2?"white":"black"} transition-all transform duration-300 {viewMode==2?"hover:bg-purple-600  hover:shadow-xl hover:scale-105 text-white":""}">Employees</button>
@@ -681,12 +681,12 @@
                 <button on:click={()=>{viewMode=4}} class="bg-{viewMode==4?"red-500":"transparent"} px-7 order-4 py-2 rounded-xl text-{viewMode==4?"white":"black"} transition-all transform duration-300 {viewMode==4?"hover:bg-red-500  hover:shadow-xl hover:scale-105 text-white":""}">Talukas</button>
             </div>
             
-                <button on:click={getInfo} class="bg-pink-500 px-7 order-4 py-2 rounded-xl text-white transition-all transform duration-300 hover:bg-pink-500  hover:shadow-xl hover:scale-105 text-white">↻ fetch data</button>
+            <button on:click={getInfo} class="bg-pink-500 mr-10 px-7 order-4 py-2 rounded-xl text-white transition-all transform duration-300 hover:bg-pink-500  hover:shadow-xl hover:scale-105 text-white">↻ fetch data</button>
 
            
         </div>
 
-        <div class="w-full flex flex-row h-auto px-10">
+        <div class="w-full flex flex-row h-auto">
             <div class="w-full rounded-xl  flex flex-col h-auto text-2xl mt-10 ">
                 {#if viewMode==0}
                     

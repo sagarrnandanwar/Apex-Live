@@ -216,7 +216,7 @@ app.get('/',(req,res)=>{
 })
 
 app.get('/getPollingStation',authenticateToken,async (req,res)=>{
-    console.log("getting ps")
+    // console.log("getting ps")
     try{
         const query = `        
                     SELECT
@@ -280,13 +280,14 @@ app.post('/registerCamera',authenticateToken,async (req,res)=>{
     }
 
         const result = await pool.query(
-            `INSERT INTO cameras (serial_number, stream_url, PS, is_active) VALUES ($1, $2, $3, $4) RETURNING serial_number`,
+            `INSERT INTO cameras (serial_number, stream_url, PS, is_active) VALUES ($1, $2, $3, $4) ON CONFLICT (serial_number) DO NOTHING RETURNING serial_number`,
             [number, `rmtp://122.170.240.142:1935/live/${number}`,poll_id.rows[0].id ,false]
         );
-
-        const serial_number = result.rows[0].serial_number;
-        res.status(201).json({ message: 'Camera registered successfully.', name: serial_number,done:true });
-        console.log("$ Camera registered with model name : " + serial_number)
+        if(result.rows.length > 0){
+            const serial_number = result.rows[0].serial_number;
+            res.status(201).json({ message: 'Camera registered successfully.', name: serial_number,done:true });
+            console.log("$ Camera registered with model name : " + serial_number)
+        }
     }catch(e){
         console.log("error occured : "+e)
         res.status(201).json({ message: 'Employee not registered.',done:false });

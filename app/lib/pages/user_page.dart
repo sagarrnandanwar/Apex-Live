@@ -37,7 +37,7 @@ class _UserPageState extends State<UserPage> {
   // final apiKey=dotenv.env['API_KEY']!;
   // final apiKey="";
 
-  String apiKey="http://192.168.1.8:2000/";
+  String apiKey="http://192.168.1.6:2000/";
 
   void fetchInfo(){
     fetchPollingStation();
@@ -269,13 +269,13 @@ class _UserPageState extends State<UserPage> {
                                               Row(
                                                 children: [
                                                   Padding(
-                                                    padding:EdgeInsets.symmetric(horizontal: 15,vertical: 15),
+                                                    padding:EdgeInsets.symmetric(horizontal: 35,vertical: 15),
                                                     child: Text("Polling Station :"),
                                                   )
                                                 ],
                                               ),
                                               Padding(
-                                                padding:EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                                                padding:EdgeInsets.only(left: 40,right:40,top: 3,bottom: 20),
                                                 child:
                                                 CustomDropdown<String>(
                                                   hintText: 'Select Polling station',

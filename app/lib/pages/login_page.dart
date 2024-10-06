@@ -19,7 +19,7 @@ class LoginPage extends StatefulWidget{
 class _LoginPageState extends State<LoginPage>{
   TextEditingController username = TextEditingController(),password=TextEditingController();
 
-  String apiKey="http://192.168.1.8:2000/";
+  String apiKey="http://192.168.1.6:2000/";
 
   @override
   void initState() {
