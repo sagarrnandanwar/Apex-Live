@@ -16,18 +16,15 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     let token = authHeader && authHeader.split(' ')[1];
 
-
-
     if (!token) {
-        token=req.token
-        // return res.status(401).json({ error: 'Token is missing' }); // Return error message
+        return res.status(401).json({ error: 'Token is missing' }); // Return error message
     }
 
     jwt.verify(token, secretKey, (err, user) => {
         if (err) {
             return res.status(403).json({ error: 'Token is invalid' }); // Return error message
         }
-        // Attach user info to the request object
+        req.admin= user.isAdmin
         req.user = user; // The decoded token will contain userId and admin status
         req.error = false; // Set error to false if authenticated
         next(); 
@@ -39,7 +36,8 @@ app.get('/authenticateToken', authenticateToken, (req, res) => {
     res.status(200).json({ 
         message: 'Token is valid', 
         error: req.error, 
-        isAdmin: req.user.admin 
+        done:true,
+        isAdmin: req.admin 
     });
 });
 
@@ -256,5 +254,5 @@ app.post('/login', async (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`\n\n\t\t\x1b[37m[⚡️] Apex Live admin server has started on \x1b[36mhttp://localhost:${port}\n\x1b[37m`);
+    console.log(`\n\n\t\t\x1b[37m[+] Apex Live admin server has started on \x1b[36mhttp://localhost:${port}\n\x1b[37m`);
 });

@@ -5,12 +5,25 @@
     let viewMode = 0;
     let projectName=''
     let isAdmin=false
-    let editCam=false
-    let editEmployee=false
+
+    let editItem=5
+
     let talukaName=''    
   
 
+    let editCameraSerialNumber=''
+    let editCameraPollingStation=''
 
+    let editEmployeeName=''
+    let editEmployeeNumber=''
+    let editEmployeeAdmin=false
+
+    let editPollingStationName=''
+    let editPollingStationAddress=''
+    let editPollingStationTaluka=''
+    let editPollingStationOperator=''
+
+    let editTalukaName=''
 
     let pollingStationNumber=''
     let pollingStationOperator=''
@@ -48,9 +61,8 @@
             title: 'Success!',
             text: message,
             icon: 'success',
-            confirmButtonText: 'Okay',
+            showConfirmButton:false,
             timer: 1000, 
-            showConfirmButton: true,
         });
     }
 
@@ -306,7 +318,6 @@
 
 
     async function authenticateToken() {
-        const token = getToken(); 
         if (!token) {
             window.location = '/login'; 
             return;
@@ -316,19 +327,22 @@
             const response = await fetch(`${url}/authenticateToken`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Send token in authorization header
+                    'Authorization': `Bearer ${token}`, 
                     'Content-Type': 'application/json'
                 }
             });
 
             const data = await response.json();
 
-            if (response.ok) {
-                // Token is valid; you can proceed to the user page or show user data
+            if(data.done){
                 console.log('Authenticated user:', data);
                 if(data.error) window.location='/login'
                 isAdmin=data.isAdmin
-               
+            }
+
+            if (response.ok) {
+                
+               console.log("real")
             } else {
                 alert(data.error || 'Token is invalid');
                 window.location = '/login'; // Redirect to login if token is invalid
@@ -350,18 +364,38 @@
         showSuccessAlert('Fetched info successful!')
     }
 
-    function openCamera(id){
-        editCam=true;
+    function openCamera(camera){
+        editCameraSerialNumber=camera.serial_number
+        editCameraPollingStation=camera.polling_station
+        editItem=0;
     }
 
-    function openEmployee(id){
-        editEmployee=true;
+    function openEmployee(employee){
+        editEmployeeName=employee.full_name
+        editEmployeeNumber=employee.phone_number
+        editEmployeeAdmin=employee.is_admin
+        editItem=1;
+    }
+    function openPollingStation(station){
+        editPollingStationName=station.polling_station
+        editPollingStationAddress=station.polling_address
+        editPollingStationTaluka=station.taluka_name
+        editPollingStationOperator=station.operator_name
+        editItem=2;
+    }
+
+    function openTaluka(taluka){
+        editTalukaName=taluka.taluka
+        editItem=3;
     }
 
     function saveChanges(){
 
     }
 
+    function deleteItem(){
+
+    }
 
     onMount(()=>{
         token=getToken()
@@ -372,23 +406,33 @@
 </script>
 
 
-<div class="{editCam?"flex":"hidden"} p-10 flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
+<div class="{editItem==0?"flex":"hidden"} p-10 flex-col items-center fixed z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
     <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
         <div class="w-full flex flex-row justify-between">
             <div class="text-5xl w-full flex flex-row justify-center mt-3">
                 Edit Camera
             </div>
-            <button on:click={()=>{editCam=false}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
+            <button on:click={()=>{editItem=5}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
         </div>
-        <div class="flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
+        <div style="max-height:70vh;" class="overflow-y-auto flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
             
             <div class="ml-10 mt-5 my-2">Polling Station :</div>
-            <input bind:value={projectName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Project Name">
-            <div class="ml-10 my-2">Location :</div>
-            <input class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Location">
+            
+                <select bind:value={editCameraPollingStation} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
+                    {#each pollingStationList as poll}
+                        <option value={poll.polling_station}>
+                            {poll.polling_station}
+                        </option>
+                    {/each}
+                </select>            
             <div class="ml-10 mt-5 my-2">Serial Number :</div>
-            <input bind:value={serialNumber} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
-            <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+            <input bind:value={editCameraSerialNumber} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
+            
+            <div class="flex flex-row gap-10 w-2/3 justify-around mx-auto">
+                <button on:click={deleteItem} class=" mx-auto mt-10 mb-10 bg-white  bg-red-500 px-7 py-2 rounded-xl text-red-700 transition-all transform duration-300 hover:bg-red-500  hover:shadow-xl hover:text-white">Delete Item</button>
+                <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-blue-500 px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+                
+            </div>
         </div>
     </div>
 </div>
@@ -396,27 +440,79 @@
 
 
 
-<div class="{editEmployee?"flex":"hidden"} p-10 flex-col items-center absolute z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
+<div class="{editItem==1?"flex":"hidden"} p-10 flex-col items-center fixed z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
     <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
         <div class="w-full flex flex-row justify-between">
             <div class="text-5xl w-full flex flex-row justify-center mt-3">
-                Edit Camera
+                Edit Employee
             </div>
-            <button on:click={()=>{editEmployee=false}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
+            <button on:click={()=>{editItem=5}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
         </div>
-        <div class="flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
+        <div style="max-height:70vh;" class="overflow-y-auto flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
             
             <div class="ml-10 mt-5 my-2">Employee Name :</div>
-            <input bind:value={projectName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Employee Name">
-            <div class="ml-10 my-2">Password :</div>
-            <input class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Password">
+            <input bind:value={editEmployeeName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Employee Name">
             <div class="ml-10 mt-5 my-2">Phone Number :</div>
-            <input bind:value={serialNumber} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Mobile Number">
-            <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+            <input bind:value={editEmployeeNumber} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Mobile Number">
+            <div class="flex flex-row items-center w-full justify-center my-5 gap-5">
+                <div>Is Admin?</div> 
+                <input class="transform scale-[2]" bind:checked={editEmployeeAdmin} type="checkbox">
+            </div>
+            <div class="flex flex-row gap-10 w-2/3 justify-around mx-auto">
+                <button on:click={deleteItem} class=" mx-auto mt-10 mb-10 bg-white  bg-red-500 px-7 py-2 rounded-xl text-red-700 transition-all transform duration-300 hover:bg-red-500  hover:shadow-xl hover:text-white">Delete Item</button>
+                <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-blue-500 px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+            </div>
         </div>
     </div>
 </div>
 
+
+<div class="{editItem==2?"flex":"hidden"} p-10 flex-col items-center fixed z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
+    <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
+        <div class="w-full flex flex-row justify-between">
+            <div class="text-5xl w-full flex flex-row justify-center mt-3">
+                Edit Polling Station
+            </div>
+            <button on:click={()=>{editItem=5}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
+        </div>
+
+
+        <div style="max-height:70vh;" class="flex overflow-y-auto flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
+            
+            <div class="ml-10 mt-5 my-2">Polling Station :</div>
+            <input bind:value={editPollingStationName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Employee Name">
+            <div class="ml-10 mt-5 my-2">Polling Station Address :</div>
+            <input bind:value={editPollingStationAddress} class="border-gray-500 border-1  ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Mobile Number">
+            
+        
+            <div class="ml-10 mt-5 my-2">Taluka :</div>
+        
+            <select bind:value={editPollingStationTaluka} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
+                {#each talukasList as taluka}
+                    <option value={taluka.taluka}>
+                        {taluka.taluka}
+                    </option>
+                {/each}
+            </select>   
+
+            <div class="ml-10 mt-5 my-2">Operator :</div>
+        
+            <select bind:value={editPollingStationOperator} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
+                {#each employeeList as employee}
+                    <option value={employee.full_name}>
+                        {employee.full_name}
+                    </option>
+                {/each}
+            </select>  
+
+
+            <div class="flex flex-row gap-10 w-2/3 justify-around mx-auto">
+                <button on:click={deleteItem} class=" mx-auto mt-10 mb-10 bg-white  bg-red-500 px-7 py-2 rounded-xl text-red-700 transition-all transform duration-300 hover:bg-red-500  hover:shadow-xl hover:text-white">Delete Item</button>
+                <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-blue-500 px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <div class="flex flex-col bg-gray-200" style="min-height:200svh;width:100%">
@@ -425,9 +521,9 @@
             <div class=" flex flex-row gap-5  pl-5 ml-10">
                 <button on:click={()=>{viewMode=0}} class="bg-{viewMode==0?"green-700":"transparent"} px-7 order-1 py-2 rounded-xl text-{viewMode==0?"white":"black"} transition-all transform duration-300 {viewMode==0?"hover:bg-green-600 hover:shadow-xl hover:scale-105 text-white":""}">Cameras</button>
                 <button on:click={()=>{viewMode=2}} class="bg-{viewMode==2?"purple-700":"transparent"} px-7 order-2 py-2 rounded-xl text-{viewMode==2?"white":"black"} transition-all transform duration-300 {viewMode==2?"hover:bg-purple-600  hover:shadow-xl hover:scale-105 text-white":""}">Employees</button>
-
+                {#if isAdmin}
                     <button on:click={()=>{viewMode=1}} class="bg-{viewMode==1?"orange-500":"transparent"} px-7 order-0 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-orange-400  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
-                
+                {/if}
                 <button on:click={()=>{viewMode=3}} class="bg-{viewMode==3?"yellow-500":"transparent"} px-7 order-3 py-2 rounded-xl text-{viewMode==3?"white":"black"} transition-all transform duration-300 {viewMode==3?"hover:bg-yellow-500  hover:shadow-xl hover:scale-105 text-white":""}">Polling Stations</button>
                 <button on:click={()=>{viewMode=4}} class="bg-{viewMode==4?"red-500":"transparent"} px-7 order-4 py-2 rounded-xl text-{viewMode==4?"white":"black"} transition-all transform duration-300 {viewMode==4?"hover:bg-red-500  hover:shadow-xl hover:scale-105 text-white":""}">Talukas</button>
             </div>
@@ -459,7 +555,7 @@
                       </thead>
                       <tbody>
                         {#each cameraList as camera}
-                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{openCamera(camera)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{camera.camera_id}</td>
                             <td class="py-2 px-4">{camera.serial_number}</td>
                             <td class="py-2 px-4">{camera.taluka_name}</td>
@@ -488,7 +584,7 @@
                             <div class="ml-10 mt-5 my-2">Polling Station :</div>
                                 <select bind:value={cameraPollStation} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
                                     {#each pollingStationList as poll}
-                                        <option>
+                                        <option value={poll.polling_station}>
                                             {poll.polling_station}
                                         </option>
                                     {/each}
@@ -510,12 +606,12 @@
                         <div class="overflow-y-auto bg-gray-300 flex flex-col rounded-3xl justify-center">
                             <div class="mx-auto mt-5 mb-5 text-4xl ">Register Employee</div>
 
-                            <div class="ml-10 mt-5 my-2">Name :</div>
-                            <input bind:value={employeeName} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Full Name">
+                            <div class="ml-10 mt-5 my-2">Username :</div>
+                            <input bind:value={employeeName} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Username">
                             <div class="ml-10 my-2">Password :</div>
                             <input bind:value={employeePassword} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Password">
                             <div class="ml-10 my-2">Mobile Number :</div>
-                            <input bind:value={employeeNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Confirm Password">
+                            <input bind:value={employeeNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Mobile">
                         
                             <div class="flex flex-row items-center w-full justify-center my-5 gap-5">
                                 <div>Is Admin?</div> 
@@ -530,13 +626,12 @@
                         
                             <div class="mx-auto mt-5 mb-5 text-4xl ">Register Polling Station</div>
 
-                            <div class="ml-10 mt-5 my-2">Polling Station Number :</div>
+                            <div class="ml-10 mt-5 my-2">Polling Station :</div>
                             <input bind:value={pollingStationNumber} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Polling Station">
                             <div class="ml-10 my-2">Operator :</div>
-
                             <select bind:value={pollingStationOperator} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
                                 {#each employeeList as employee}
-                                    <option>{employee.full_name}</option>
+                                    <option value={employee.full_name}>{employee.full_name}</option>
                                 {/each}
                             </select>
 
@@ -544,13 +639,13 @@
                             <div class="ml-10 mt-5 my-2">Taluka :</div>
                             <select bind:value={pollingStationTaluka} class="ml-7 w-3/4 px-3 py-2 rounded-xl">
                                 {#each talukasList as taluka}
-                                    <option>{taluka.taluka}</option>
+                                    <option value={taluka.taluka}>{taluka.taluka}</option>
                                 {/each}
                             </select>
                             
                             <div class="ml-10 mt-5 my-2">Address :</div>
                             
-                            <input bind:value={pollingStationAddress} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Serial Number">
+                            <input bind:value={pollingStationAddress} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Address">
                             
                             <button on:click={registerPollingStation} class="w-1/4 mx-auto mt-10 mb-4  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-blue-500  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
                                              
@@ -563,7 +658,7 @@
                             <div class="mx-auto mt-5 mb-5 text-4xl ">Register Taluka</div>
 
                             <div class="ml-10 mt-5 my-2">Taluka Name :</div>
-                            <input bind:value={talukaName} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Full Name">
+                            <input bind:value={talukaName} class="ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Taluka Name">
                                                       
                             <button on:click={registerTaluka} class="w-1/4 mx-auto mt-10 mb-10  bg-{viewMode==1?"blue-500":"transparent"} px-7 py-2 rounded-xl text-{viewMode==1?"white":"black"} transition-all transform duration-300 {viewMode==1?"hover:bg-blue-500  hover:shadow-xl hover:scale-105 text-white":""}">Register</button>
                                    
@@ -584,7 +679,7 @@
                       </thead>
                       <tbody>
                         {#each employeeList as employee (employee.id)}
-                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{openEmployee(employee)}} class="border-b border-gray-200 hover:bg-gray-100 hover:cursor-pointer">
                             <td class="py-2 px-4">{employee.id}</td>
                             <td class="py-2 px-4">{employee.full_name}</td>
                             <td class="py-2 px-4">{employee.phone_number}</td>
@@ -612,7 +707,7 @@
                       </thead>
                       <tbody>
                         {#each pollingStationList as station (station.polling_station_id)}
-                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{openPollingStation(station)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{station.polling_station_id}</td>
                             <td class="py-2 px-4">{station.polling_station}</td>
                             <td class="py-2 px-4">{station.polling_address}</td>
@@ -637,10 +732,12 @@
                       </thead>
                       <tbody>
                         {#each talukasList as taluka (taluka.id)}
-                          <tr class="border-b border-gray-200 hover:bg-gray-100">
+
+                          <tr  class="border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{taluka.id}</td>
                             <td class="py-2 px-4">{taluka.taluka}</td>
                           </tr>
+                        
                         {/each}
                       </tbody>
                     </table>
