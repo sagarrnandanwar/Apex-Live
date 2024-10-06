@@ -270,6 +270,7 @@ app.post('/registerCamera',authenticateToken,async (req,res)=>{
     const {number,poll_station} = req.body
     const trimmed_poll_station = poll_station.trim();
 
+
     try{
 
         const poll_id = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[trimmed_poll_station])
@@ -277,7 +278,7 @@ app.post('/registerCamera',authenticateToken,async (req,res)=>{
        if (poll_id.rowCount === 0) {
         console.log(`-> Polling station "${poll_station}" not found.`);
         return res.status(404).json({ message: 'Polling station not found', done: false });
-    }
+        }
 
         const result = await pool.query(
             `INSERT INTO cameras (serial_number, stream_url, PS, is_active) VALUES ($1, $2, $3, $4) ON CONFLICT (serial_number) DO NOTHING RETURNING serial_number`,

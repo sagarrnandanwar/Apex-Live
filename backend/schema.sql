@@ -29,8 +29,8 @@ CREATE TABLE polling_stations(
 
 CREATE TABLE cameras (
     id SERIAL PRIMARY KEY,
-    PS INTEGER,
-    FOREIGN KEY (PS) REFERENCES polling_stations(id),
+    PS INTEGER ,
+    FOREIGN KEY (PS) REFERENCES polling_stations(id) ON DELETE SET NULL,
     serial_number TEXT UNIQUE,
     stream_url TEXT,
     sent_at TEXT,

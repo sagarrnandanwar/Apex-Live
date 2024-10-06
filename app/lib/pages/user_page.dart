@@ -29,6 +29,7 @@ class _UserPageState extends State<UserPage> {
   final serialNumberController = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   String? selectedPollingStationId;
+  String? pollingStationId;
   bool isDropdownOpen = false;
   List<String> pollingStationIdList=['Select polling station'];
 
@@ -149,43 +150,35 @@ class _UserPageState extends State<UserPage> {
   }
 
 
-  Future<void> createCamera(String projectName, String Location,String Model) async {
-    final url = Uri.parse('${apiKey}login');
+  Future<void> registerCamera(modelNumber,pollingStation) async{
+    String? token = await storage.read(key: 'authToken');
 
+    final url = Uri.parse('${apiKey}registerCamera');
     final body = jsonEncode({
-      'projectName': projectName,
-      'location': Location,
+      'number': modelNumber,
+      'poll_station': pollingStation,
     });
 
     try {
       final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: body,
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },body:body
       );
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
+        print('Registered camera successfully: ${response.body}');
 
-        if (responseData.containsKey('token')) {
-          String token = responseData['token'];
-          await saveToken(token);
 
-          print('Login successful: ${response.body}');
-          Navigator.pushNamed(context, '/home');
-        } else {
-          print('Token not found in response');
-        }
       } else {
-        print('Login failed: ${response.statusCode} - ${response.body}');
+        print('Fetch failed: ${response.statusCode} - ${response.body}');
       }
     } catch (error) {
       print('Error occurred: $error');
     }
   }
-
 
 
 
@@ -282,7 +275,7 @@ class _UserPageState extends State<UserPage> {
                                                   items: pollingStationIdList,
                                                   initialItem: pollingStationIdList[0],
                                                   onChanged: (value) {
-                                                    print("value = ");
+                                                    pollingStationId=value;
                                                   },
                                                 ),
                                               ),
@@ -332,7 +325,9 @@ class _UserPageState extends State<UserPage> {
                                 floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
                                 floatingActionButton: FloatingActionButton.large(
 
-                                  onPressed: (){},
+                                  onPressed: (){
+                                    registerCamera(serialNumberController.text,pollingStationId);
+                                  },
                                   backgroundColor: Colors.blue,
                                   child: const Icon(Icons.send_rounded, size: 45, color: Colors.white),
                                 ),
