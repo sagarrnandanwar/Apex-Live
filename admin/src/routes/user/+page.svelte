@@ -514,6 +514,26 @@
     </div>
 </div>
 
+<div class="{editItem==3?"flex":"hidden"} p-10 flex-col items-center fixed z-20 bg-black bg-opacity-70" style="height:100%;width:100vw">
+    <div class="w-2/3 bg-gray-100 mx-auto rounded-xl">
+        <div class="w-full flex flex-row justify-between">
+            <div class="text-5xl w-full flex flex-row justify-center mt-3">
+                Edit Taluka
+            </div>
+            <button on:click={()=>{editItem=5}} class="mt-3 px-7 py-3 text-red-500 text-4xl">❌</button>
+        </div>
+        <div style="max-height:70vh;" class="overflow-y-auto flex flex-col mx-auto w-2/3 gap-3 text-2xl my-10 bg-gray-300 rounded-xl">
+            
+            <div class="ml-10 mt-5 my-2">Taluka Name :</div>
+            <input bind:value={editTalukaName} class="border-gray-500 border-1 ml-7 w-3/4 px-3 py-2 rounded-xl" placeholder="Employee Name">
+            
+            <div class="flex flex-row gap-10 w-2/3 justify-around mx-auto">
+                <button on:click={deleteItem} class=" mx-auto mt-10 mb-10 bg-white  bg-red-500 px-7 py-2 rounded-xl text-red-700 transition-all transform duration-300 hover:bg-red-500  hover:shadow-xl hover:text-white">Delete Item</button>
+                <button on:click={saveChanges} class=" mx-auto mt-10 mb-10 bg-white  bg-blue-500 px-7 py-2 rounded-xl text-blue-700 transition-all transform duration-300 hover:bg-blue-500  hover:shadow-xl hover:text-white">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="flex flex-col bg-gray-200" style="min-height:200svh;width:100%">
     <div class="w-full py-10 h-full rounded-xl px-20 text-2xl">
@@ -733,7 +753,7 @@
                       <tbody>
                         {#each talukasList as taluka (taluka.id)}
 
-                          <tr  class="border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{openTaluka(taluka)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{taluka.id}</td>
                             <td class="py-2 px-4">{taluka.taluka}</td>
                           </tr>
