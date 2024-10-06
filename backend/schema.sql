@@ -23,7 +23,7 @@ CREATE TABLE polling_stations(
     polling_address TEXT,
     taluka INTEGER,
     operator INTEGER,
-    FOREIGN KEY (operator) REFERENCES employees(id),
+    FOREIGN KEY (operator) REFERENCES employees(id) ON DELETE SET NULL,
     FOREIGN KEY(taluka) REFERENCES taluka(id)
 );
 

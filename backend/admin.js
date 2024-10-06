@@ -41,42 +41,123 @@ app.get('/authenticateToken', authenticateToken, (req, res) => {
     });
 });
 
-function alterTableQuery(table,info1,info2,info3,info4,reference){
-    switch(table){
-        case 0:{
-            const polling_staions = await pool.query('SELECT id FROM polling_stations WHERE polling_station = $1',[info2])
-            return `
+async function alterTableQuery(table, info1, info2, info3, info4, reference) {
+    switch (table) {
+        case 'cameras': {
+            console.log(`${info1}`);
+            const trimmed_poll_station = info1.trim();
+            
+            const poll_id_result = await pool.query(
+                'SELECT id FROM polling_stations WHERE polling_station = $1',
+                [trimmed_poll_station]
+            );
+
+            if (poll_id_result.rows.length === 0) {
+                throw new Error(`No polling station found for ${info1}`);
+            }
+
+            const poll_id = poll_id_result.rows[0].id;
+            console.log('Polling station ID:', poll_id);
+
+            const query = `
                 UPDATE ${table}
-                SET serial_number = ${info1}, PS = ${polling_staions.rows[0]}
-                WHERE id = ${reference}
-            `
-        }break;
-        case 1:{
+                SET serial_number = $1, PS = $2
+                WHERE id = $3
+            `;
 
-        }break;
-        case 2:{
+            return { query, params: [info1, poll_id, reference] };
+        };
+        case 'polling_stations': {
 
-        }break;
-        case 3:{
+            console.log(`${info1}`);
+            const trimmed_taluka = info3.trim();
+            const trimmed_operator=info4.trim();
 
-        }break;
-        
+            const taluka_id = await pool.query(
+                'SELECT id FROM taluka WHERE taluka = $1',
+                [trimmed_taluka]
+            );
+            
+            const operator_id = await pool.query(
+                'SELECT id FROM employees WHERE full_name = $1',
+                [trimmed_operator]
+            )
+
+            if (taluka_id.rows.length === 0 || operator_id.rows.length === 0) {
+                throw new Error(`No polling station found for ${info3} or ${info4}`);
+            }
+
+            
+            const query = `
+                UPDATE ${table}
+                SET polling_station = $1, polling_address = $2, taluka = $3, operator=$4 
+                WHERE id = $5
+            `;
+
+            return { query, params: [info1,info2 ,taluka_id.rows[0].id , operator_id.rows[0].id, reference] };
+        }
+        case 'employees': {
+         
+            
+            const query = `
+                UPDATE ${table}
+                SET full_name = $1, phone_number = $2, is_admin = $3
+                WHERE id = $4
+            `;
+
+            return { query, params: [info1,info2 ,info3?1:0 , reference] };
+        }
+        case 'taluka': {
+         
+            
+            const query = `
+                UPDATE ${table}
+                SET taluka = $1
+                WHERE id = $2
+            `;
+
+            return { query, params: [info1, reference] };
+        }
     }
 }
 
-app.get('/editItem:table',authenticateToken,async (req,res)=>{
-    const table = req.params.table;
-    const {info1,info2,info3,info3,reference} = req.body
-    const query= alterTableQuery(table,info1,info2,info3,info4,reference);
-    
+app.post('/editItem', authenticateToken, async (req, res) => {
+    const { info1, info2, info3, info4, reference, table } = req.body;
+
+    try {
+        // Get the query and parameters
+        const { query, params } = await alterTableQuery(table, info1, info2, info3, info4, reference);
+
+
+        // Execute the query
+        const { rows } = await pool.query(query, params);
+
+        res.status(200).json({ done: true, info: table });
+        console.log('Table altered : ' +table)
+    } catch (err) {
+        console.error('error:', err.message);
+        res.status(500).json({ done: false, message: err.message });
+    }
+});
+
+
+app.post('/deleteItem',authenticateToken,async (req,res)=>{
+    const {table,reference} =req.body
     try{
-        const {rows} = await pool.query(query)
-        res.status(200).json({done:true,rows.rows[0]});
+        const query=`
+            DELETE FROM ${table}
+            WHERE id = $1
+        `
+        const { rows } = await pool.query(query, [reference]);
+        res.status(200).json({ done: true, info: table });
+        console.log('[-] Item deleted : ' +table)
 
     }catch(err){
-        console.log("error :" +err)
-   }
+        console.log("Error occured : "+err)
+    }
 })
+
+
 
 app.get('/getEmployees',authenticateToken,async (req,res)=>{
     try{
@@ -239,7 +320,7 @@ app.post('/registerTaluka',authenticateToken,async (req,res)=>{
 
         const talukaName = result.rows[0].taluka;
         res.status(201).json({ message: 'Employee registered successfully.', name: talukaName,done:true });
-        console.log("$ Taluka registered with name : " + talukaName)
+        console.log("[+] Taluka registered with name : " + talukaName)
     }catch(e){
         console.log("error occured : "+e)
         res.status(201).json({ message: 'Employee not registered.',done:false });

@@ -384,9 +384,10 @@
             }break;
 
         }
-    
+
+        
         try {
-            const response = await fetch(`${url}/editItem/${infoTable}`, {
+            const response = await fetch(`${url}/editItem`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`, 
@@ -397,6 +398,7 @@
                      info2: info2,
                      info3: info3,
                      info4: info4,
+                     table:infoTable,
                      reference: editReference
                     }) 
 
@@ -406,7 +408,7 @@
 
             if(data.done){
                 showSuccessAlert("Item Altered! : " + data.info)
-                getInfo()    
+                getInfo(false)    
             }
 
             if (response.ok) {
@@ -422,14 +424,77 @@
         }
     }
 
+
+
+            async function deleteItem() {
+
+                let infoTable=''
+                switch(editItem){
+                    case 0:{
+                        
+                        infoTable='cameras'
+                    }break;
+                    case 1:{
+                        
+                        infoTable='employees'
+
+                    }break;
+                    case 2:{
+                        
+                        infoTable='polling_stations'
+                    }break;
+                    case 3:{
+                       
+                        infoTable='taluka'
+                    }break;
+
+                }
+
+
+                try {
+                    const response = await fetch(`${url}/deleteItem`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`, 
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            table:infoTable,
+                            reference: editReference
+                            }) 
+
+                    });
+
+                    const data = await response.json();
+
+                    if(data.done){
+                        editItem=5
+                        showSuccessAlert("Item Deleted! : " + data.info)
+                        getInfo(false)    
+                    }
+
+                    if (response.ok) {
+                        
+                    console.log("real")
+                    } else {
+                        alert(data.error || 'Token is invalid');
+                        window.location = '/login'; 
+                    }
+                } catch (error) {
+                    console.error('Error during token authentication:', error);
+                    alert("An error occurred while authenticating the token.");
+                }
+                }
+
+
    
 
-    function getInfo(){
+    function getInfo(showDialogue){
         fetchPollingStations()
         fetchEmployees()
         fetchTalukas()
         fetchCameras()
-        showSuccessAlert('Fetched info successful!')
+        if(showDialogue)showSuccessAlert('Fetched info successful!')
     }
 
     function openCamera(camera){
@@ -463,10 +528,6 @@
     }
 
     
-
-    function deleteItem(){
-
-    }
 
     onMount(()=>{
         token=getToken()
