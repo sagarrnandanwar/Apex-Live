@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    let url = 'http://192.168.137.1:2000';
+    let url = 'http://localhost:2000';
     let username = '';
     let password = '';
 
