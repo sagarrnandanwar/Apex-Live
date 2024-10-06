@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -18,16 +19,97 @@ class UserPage extends StatefulWidget {
   _UserPageState createState() => _UserPageState();
 }
 
+
 class _UserPageState extends State<UserPage> {
   var bottomNavIndex = 0;
-  var isAdmin=true;
   bool isProcessing = false;
   XFile? capturedImage;
   String? decodedQRCode;
+  bool isAdmin=false;
   final serialNumberController = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  String? selectedPollingStationId;
+  bool isDropdownOpen = false;
+  List<String> pollingStationIdList=['Select polling station'];
+
+
+
   // final apiKey=dotenv.env['API_KEY']!;
-  final apiKey="";
+  // final apiKey="";
+
+  String apiKey="http://192.168.1.8:2000/";
+
+  void fetchInfo(){
+    fetchPollingStation();
+  }
+
+  Future<void> fetchPollingStation() async{
+    String? token = await storage.read(key: 'authToken');
+
+    final url = Uri.parse('${apiKey}getPollingStation');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Fetched info successfully: ${response.body}');
+        final List<dynamic> responseData = jsonDecode(response.body);
+
+        setState(() {
+          pollingStationIdList = responseData.map((data) {
+            return data['polling_station'] as String;
+          }).toList();
+        });
+
+      } else {
+        print('Fetch failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (error) {
+      print('Error occurred: $error');
+    }
+  }
+
+
+  Future<void> authenticateToken() async {
+    String? token = await storage.read(key: 'authToken');
+
+    final url = Uri.parse(apiKey+'authenticateToken');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Login successful: ${response.body}');
+        final responseData = jsonDecode(response.body);
+
+        setState(() {
+          isAdmin = responseData['isAdmin'];
+        });
+
+        print('===========================$isAdmin=============================');
+      } else {
+        print('Login failed: ${response.statusCode} - ${response.body}');
+        removeToken();
+        Navigator.pushNamed(context, '/login');
+      }
+    } catch (error) {
+      print('Error occurred: $error');
+    }
+  }
+
+
 
   Future<void> createEmployee(String name, String password,String mobile) async {
     final url = Uri.parse('${apiKey}login');
@@ -111,6 +193,8 @@ class _UserPageState extends State<UserPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    authenticateToken();
+    fetchInfo();
     _requestCameraPermission();
 
   }
@@ -133,6 +217,9 @@ class _UserPageState extends State<UserPage> {
 
           slivers: [
             SliverAppBar(
+              backgroundColor: Colors.white,
+              elevation: 20,
+              automaticallyImplyLeading: false,
               floating: true,
               pinned:false,
               title: Text(bottomNavIndex==0?"Camera":"Employees"),
@@ -140,7 +227,7 @@ class _UserPageState extends State<UserPage> {
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton:Column(
+        floatingActionButton: isAdmin? Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
 
@@ -179,6 +266,27 @@ class _UserPageState extends State<UserPage> {
                                           child: Column(
                                             children: [
 
+                                              Row(
+                                                children: [
+                                                  Padding(
+                                                    padding:EdgeInsets.symmetric(horizontal: 15,vertical: 15),
+                                                    child: Text("Polling Station :"),
+                                                  )
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                                                child:
+                                                CustomDropdown<String>(
+                                                  hintText: 'Select Polling station',
+                                                  items: pollingStationIdList,
+                                                  initialItem: pollingStationIdList[0],
+                                                  onChanged: (value) {
+                                                    print("value = ");
+                                                  },
+                                                ),
+                                              ),
+
                                               ClipRRect(
                                                 borderRadius: BorderRadius.circular(20),
                                                 child: SizedBox(
@@ -215,27 +323,6 @@ class _UserPageState extends State<UserPage> {
                                                   ),
                                                 ),
                                               ),
-
-
-
-
-                                              const Text("Selected Location"),
-                                              DropdownButton(
-                                                  items: const [
-
-                                                  ],
-                                                  onChanged: (index){
-
-                                                  }
-                                              ),
-                                              Button(
-                                                  context,
-                                                  getWidth(context)*0.7,
-                                                  "Create Camera",
-                                                      () async {
-                                                    await createCamera("Project Name","Location","Model Number");
-                                                  }
-                                              )
                                             ],
                                           ),
                                         )
@@ -247,7 +334,7 @@ class _UserPageState extends State<UserPage> {
 
                                   onPressed: (){},
                                   backgroundColor: Colors.blue,
-                                  child: const Icon(Icons.qr_code_2_rounded, size: 45, color: Colors.white),
+                                  child: const Icon(Icons.send_rounded, size: 45, color: Colors.white),
                                 ),
 
                               ),
@@ -295,8 +382,6 @@ class _UserPageState extends State<UserPage> {
                                           height: getHeight(context)*1.5,
                                           child: Column(
                                             children: [
-
-
                                               Padding(
                                                 padding: const EdgeInsets.only(left: 24, right: 24, top: 25,bottom:10),
                                                 child: ClipRRect(
@@ -376,7 +461,7 @@ class _UserPageState extends State<UserPage> {
               height: 10,
             ),
           ],
-        ),
+        ):Container(),
         bottomNavigationBar: BottomNavigationBar(
           elevation: 20,
           showSelectedLabels: true,

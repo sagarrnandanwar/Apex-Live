@@ -3,7 +3,6 @@
     import Swal from 'sweetalert2';
 
     let viewMode = 0;
-    let projectName=''
     let isAdmin=false
 
     let editItem=5
@@ -347,7 +346,7 @@
                console.log("real")
             } else {
                 alert(data.error || 'Token is invalid');
-                window.location = '/login'; // Redirect to login if token is invalid
+                window.location = '/login'; 
             }
         } catch (error) {
             console.error('Error during token authentication:', error);
@@ -356,7 +355,7 @@
     }
 
     async function saveChanges() {
-
+        if(!isAdmin)return
         let info1='',info2='',info3='',info4='',infoTable=''
         switch(editItem){
             case 0:{
@@ -427,6 +426,7 @@
 
 
             async function deleteItem() {
+                if(!isAdmin)return
 
                 let infoTable=''
                 switch(editItem){
@@ -707,7 +707,7 @@
                       </thead>
                       <tbody>
                         {#each cameraList as camera}
-                          <tr on:click={()=>{openCamera(camera)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{if(isAdmin)openCamera(camera)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{camera.camera_id}</td>
                             <td class="py-2 px-4">{camera.serial_number}</td>
                             <td class="py-2 px-4">{camera.taluka_name}</td>
@@ -831,7 +831,7 @@
                       </thead>
                       <tbody>
                         {#each employeeList as employee (employee.id)}
-                          <tr on:click={()=>{openEmployee(employee)}} class="border-b border-gray-200 hover:bg-gray-100 hover:cursor-pointer">
+                          <tr on:click={()=>{if(isAdmin)openEmployee(employee)}} class="border-b border-gray-200 hover:bg-gray-100 hover:cursor-pointer">
                             <td class="py-2 px-4">{employee.id}</td>
                             <td class="py-2 px-4">{employee.full_name}</td>
                             <td class="py-2 px-4">{employee.phone_number}</td>
@@ -859,7 +859,7 @@
                       </thead>
                       <tbody>
                         {#each pollingStationList as station (station.polling_station_id)}
-                          <tr on:click={()=>{openPollingStation(station)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{if(isAdmin)openPollingStation(station)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{station.polling_station_id}</td>
                             <td class="py-2 px-4">{station.polling_station}</td>
                             <td class="py-2 px-4">{station.polling_address}</td>
@@ -885,7 +885,7 @@
                       <tbody>
                         {#each talukasList as taluka (taluka.id)}
 
-                          <tr on:click={()=>{openTaluka(taluka)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
+                          <tr on:click={()=>{if(isAdmin)openTaluka(taluka)}} class="hover:cursor-pointer border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-2 px-4">{taluka.id}</td>
                             <td class="py-2 px-4">{taluka.taluka}</td>
                           </tr>

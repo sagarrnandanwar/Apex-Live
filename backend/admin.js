@@ -3,7 +3,6 @@ const pool = require('./database');
 require('dotenv').config();
 const app = express();
 const port = process.env.ADMIN_PORT;
-const { printValue, printLog } = require('./print');
 const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const secretKey='apex_live'
@@ -15,23 +14,22 @@ app.use(cors())
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     let token = authHeader && authHeader.split(' ')[1];
-
     if (!token) {
-        return res.status(401).json({ error: 'Token is missing' }); // Return error message
+        return res.status(401).json({ error: 'Token is missing' }); 
     }
 
     jwt.verify(token, secretKey, (err, user) => {
         if (err) {
-            return res.status(403).json({ error: 'Token is invalid' }); // Return error message
+            return res.status(403).json({ error: 'Token is invalid' }); 
         }
+
         req.admin= user.isAdmin
-        req.user = user; // The decoded token will contain userId and admin status
-        req.error = false; // Set error to false if authenticated
+        req.user = user; 
+        req.error = false;
         next(); 
     });
 }
 
-// Endpoint to authenticate token
 app.get('/authenticateToken', authenticateToken, (req, res) => {
     res.status(200).json({ 
         message: 'Token is valid', 
@@ -209,6 +207,7 @@ app.get('/getCameras',authenticateToken,async (req,res)=>{
 
 
 app.get('/getPollingStation',authenticateToken,async (req,res)=>{
+    console.log("getting ps")
     try{
         const query = `        
                     SELECT
@@ -332,7 +331,6 @@ app.post('/registerTaluka',authenticateToken,async (req,res)=>{
 app.post('/login', async (req, res) => {
     const { name, password } = req.body;
 
-    // Validate input
     if (!name || !password) {
         console.log('-> Missing name or password');
         return res.status(400).json({ error: 'name and password are required' });
@@ -348,7 +346,6 @@ app.post('/login', async (req, res) => {
 
         const storedPassword = rows[0].pass;
 
-        // Compare passwords (simple comparison for this example)
         if (password === storedPassword) {
             const token = jwt.sign({ userId: rows[0].id, isAdmin: (rows[0].is_admin !== 0) }, secretKey, { expiresIn: '4h' });
             console.log('-> Login request successful with:', name);

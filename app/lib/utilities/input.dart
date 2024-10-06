@@ -39,7 +39,10 @@ class _InputState extends State<Input> {
             filled: true,
             fillColor: Colors.white,
             prefixIcon: Icon(widget.icon),
-            hintText: "Model Number",
+            hintText: widget.label,
+            hintStyle: TextStyle(
+              color:Colors.grey.shade700
+            ),
             border: InputBorder.none,
           ),
           style: const TextStyle(color: Colors.black),
