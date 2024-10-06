@@ -7,6 +7,9 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const secretKey='apex_live'
 
+let index=0
+
+
 app.use(express.json());
 app.use(cors())
 
@@ -205,6 +208,12 @@ app.get('/getCameras',authenticateToken,async (req,res)=>{
     }
 })
 
+
+app.get('/',(req,res)=>{
+    console.log(`[${index}] port is working`)
+    index++
+    res.send('hello sagar')
+})
 
 app.get('/getPollingStation',authenticateToken,async (req,res)=>{
     console.log("getting ps")
