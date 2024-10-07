@@ -18,6 +18,11 @@
         row : "3",
         col : "4"
     };
+
+    let slideDurationList=[3,7,12,16,20,30,35]
+
+    let selectedDuration=12
+
     let resolutionList=[
         {
             r:"3",
@@ -127,6 +132,16 @@
        }
    }
 
+   function changeSlide() {
+    let camerasPerSet = Number(selectedResolution.row) * Number(selectedResolution.col);
+    
+    cameraIndex += camerasPerSet;
+
+    if (cameraIndex >= cameraList.length) {
+      cameraIndex = 0;
+    }
+  }
+
    function handleResolution(resolution){
     selectedResolution.row=resolution.r
     selectedResolution.col=resolution.c
@@ -140,8 +155,15 @@
 
    onMount(()=>{
     token=getToken()
-    // authenticateToken()
     getInfo()
+    interval = setInterval(() => changeSlide(), selectedDuration * 1000); 
+    // authenticateToken()
+    // interval = setInterval(()=>changeSlide(), selectedDuration*1000);
+
+
+    // return () => {
+    //     clearInterval(interval);
+    // };
    })
 
 </script>
@@ -174,7 +196,11 @@
                         <option value='{resolution.r} x {resolution.c}'>{resolution.r} x {resolution.c}</option>
                     {/each}
                 </select>
-                <button class="rounded-xl border border-xl px-3 py-1">slide duration</button>
+                <select class="rounded-xl border border-xl  px-3 py-1  " on:change="{(e) => {selectedDuration=slideDurationList[e.target.selectedIndex]}}">
+                    {#each slideDurationList as duration}
+                        <option value={duration}>Slide Duration : {duration}s</option>
+                    {/each}
+                </select>
             </div>
 
         </div>
@@ -186,7 +212,7 @@
                 {#each cameraList.slice(cameraIndex, cameraIndex + Number(selectedResolution.row) * Number(selectedResolution.col)) as camera}
                     <button class="text-white bg-gray-700 px-1 py-1 flex flex-col text-left whitespace-nowrap overflow-hidden w-full text-ellipse justify-end items-left  transform hover:scale-95 rounded-lg transaction-all duration-300" >
                         <div class="bg-blue-400 rounded-lg h-auto flex-grow w-full h-full"></div>
-                        <div>PS : 134 , CID : H4G178566 , Address : awpdldapldaplpalpdaldpa</div>
+                        <div> PS : {camera.polling_station} Model : {camera.serial_number} Address : {camera.polling_address}</div>
                     </button>
                 {/each}
         </div>
